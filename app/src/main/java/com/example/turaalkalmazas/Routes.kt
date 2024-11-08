@@ -1,11 +1,13 @@
 package com.example.turaalkalmazas
 
-const val MAIN_SCREEN = "MainScreen"
-const val NOTE_SCREEN = "NoteScreen"
 const val SIGN_IN_SCREEN = "SignInScreen"
 const val SIGN_UP_SCREEN = "SignUpScreen"
 const val SPLASH_SCREEN = "SplashScreen"
 const val ACCOUNT_CENTER_SCREEN = "AccountCenterScreen"
+const val MAP_SCREEN = "MapScreen"
+const val ROUTES_SCREEN = "RoutesScreen"
+const val MY_ROUTES_SCREEN = "MyRoutesScreen"
+const val FRIENDS_SCREEN = "FriendsScreen"
 
 const val NOTE_ID = "noteId"
 const val NOTE_DEFAULT_ID = "-1"

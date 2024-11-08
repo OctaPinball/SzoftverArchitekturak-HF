@@ -1,4 +1,4 @@
-package com.example.turaalkalmazas.screens.main
+package com.example.turaalkalmazas.screens.friends
 
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.model.User
@@ -10,10 +10,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class MainViewModel @Inject constructor(
+class FriendsViewModel @Inject constructor(
     private val accountService: AccountService
 ) : AppViewModel() {
-    // Backing property to avoid state updates from other classes
     private val _user = MutableStateFlow(User())
     val user: StateFlow<User> = _user.asStateFlow()
 

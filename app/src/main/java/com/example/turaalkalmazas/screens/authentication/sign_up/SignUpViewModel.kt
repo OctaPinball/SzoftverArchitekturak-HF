@@ -5,7 +5,7 @@ import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.ERROR_TAG
-import com.example.turaalkalmazas.MAIN_SCREEN
+import com.example.turaalkalmazas.MAP_SCREEN
 import com.example.turaalkalmazas.SIGN_UP_SCREEN
 import com.example.turaalkalmazas.UNEXPECTED_CREDENTIAL
 import com.example.turaalkalmazas.screens.authentication.isValidEmail
@@ -60,7 +60,7 @@ class SignUpViewModel @Inject constructor(
             }
 
             accountService.linkAccountWithEmail(_email.value, _password.value)
-            openAndPopUp(MAIN_SCREEN, SIGN_UP_SCREEN)
+            openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
         }
     }
 
@@ -69,7 +69,7 @@ class SignUpViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.linkAccountWithGoogle(googleIdTokenCredential.idToken)
-                openAndPopUp(MAIN_SCREEN, SIGN_UP_SCREEN)
+                openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
             }

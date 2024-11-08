@@ -24,4 +24,8 @@
     <string name="profile_provider">Account provider: %1$s</string>
     <string name="update">Update</string>
     <string name="or">or</string>
+    <string name="map">Map</string>
+    <string name="routes">Routes</string>
+    <string name="my_routes">My routes</string>
+    <string name="friends">Friends</string>
 </resources>

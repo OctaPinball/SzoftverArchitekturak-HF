@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 @Stable
-class NotesAppState(
+class AppState(
     private val snackbarHostState: SnackbarHostState,
     val navController: NavHostController,
     private val snackbarManager: SnackbarManager,

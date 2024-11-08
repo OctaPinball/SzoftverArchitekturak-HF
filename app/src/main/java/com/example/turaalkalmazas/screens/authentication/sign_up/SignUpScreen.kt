@@ -1,6 +1,5 @@
 package com.example.turaalkalmazas.screens.authentication.sign_up
 
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement

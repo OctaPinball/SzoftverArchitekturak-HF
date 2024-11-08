@@ -5,7 +5,7 @@ import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.ERROR_TAG
-import com.example.turaalkalmazas.MAIN_SCREEN
+import com.example.turaalkalmazas.MAP_SCREEN
 import com.example.turaalkalmazas.SIGN_IN_SCREEN
 import com.example.turaalkalmazas.UNEXPECTED_CREDENTIAL
 import com.example.turaalkalmazas.service.AccountService
@@ -39,7 +39,7 @@ class SignInViewModel @Inject constructor(
     fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
         launchCatching {
             accountService.signInWithEmail(_email.value, _password.value)
-            openAndPopUp(MAIN_SCREEN, SIGN_IN_SCREEN)
+            openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
         }
     }
 
@@ -48,7 +48,7 @@ class SignInViewModel @Inject constructor(
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                openAndPopUp(MAIN_SCREEN, SIGN_IN_SCREEN)
+                openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
             }
