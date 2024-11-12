@@ -34,4 +34,5 @@
     <string name="invalid_password_format">Invalid password format</string>
     <string name="passwords_not_match">Passwords do not match</string>
     <string name="dismiss">Dismiss</string>
+    <string name="click_to_log_in">Click here to log in</string>
 </resources>

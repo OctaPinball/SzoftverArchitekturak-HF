@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarData
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -68,11 +67,6 @@ fun MainScreen(
 ) {
     val user by viewModel.user.collectAsState(initial = User())
 
-    var username = "Click to log in"
-    if(user.displayName != ""){
-        username = user.displayName
-    }
-
     Theme {
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
@@ -96,7 +90,8 @@ fun MainScreen(
                     }
                 },
                 topBar = {
-                    UserCard(userName = username, profileImage = Icons.Default.Person) {
+                    UserCard(userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
+                        profileImage = Icons.Default.Person) {
                         appState.navigate(ACCOUNT_CENTER_SCREEN)
                     }
                 },

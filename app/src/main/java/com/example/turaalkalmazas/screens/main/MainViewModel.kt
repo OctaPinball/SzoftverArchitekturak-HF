@@ -13,13 +13,17 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val accountService: AccountService
 ) : AppViewModel() {
-    // Backing property to avoid state updates from other classes
+
     private val _user = MutableStateFlow(User())
     val user: StateFlow<User> = _user.asStateFlow()
 
     init {
         launchCatching {
-            _user.value = accountService.getUserProfile()
+            accountService.currentUser.collect { profile ->
+                profile?.let {
+                    _user.value = it
+                }
+            }
         }
     }
 }
