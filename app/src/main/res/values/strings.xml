@@ -35,4 +35,6 @@
     <string name="passwords_not_match">Passwords do not match</string>
     <string name="dismiss">Dismiss</string>
     <string name="click_to_log_in">Click here to log in</string>
+    <string name="add_friends">Add</string>
+    <string name="friend_request">Requests</string>
 </resources>
