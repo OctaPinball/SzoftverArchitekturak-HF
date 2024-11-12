@@ -1,12 +1,16 @@
 package com.example.turaalkalmazas.screens.authentication.sign_in
 
+import android.content.Context
+import android.provider.Settings.Secure.getString
 import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.ERROR_TAG
 import com.example.turaalkalmazas.MAP_SCREEN
+import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.SIGN_IN_SCREEN
+import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.UNEXPECTED_CREDENTIAL
 import com.example.turaalkalmazas.service.AccountService
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -36,10 +40,28 @@ class SignInViewModel @Inject constructor(
         _password.value = newPassword
     }
 
-    fun onSignInClick(openAndPopUp: (String, String) -> Unit) {
+    fun onSignInClick(context: Context, openAndPopUp: (String, String) -> Unit) {
         launchCatching {
-            accountService.signInWithEmail(_email.value, _password.value)
-            openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
+            if (_email.value.isBlank()) {
+                SnackbarManager.showErrorMessage(context.getString(R.string.email_empty))
+                return@launchCatching
+            }
+
+            if (_password.value.isBlank()) {
+                SnackbarManager.showErrorMessage(context.getString(R.string.password_empty))
+                return@launchCatching
+            }
+
+            try
+            {
+                accountService.signInWithEmail(_email.value, _password.value)
+                openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
+            }
+            catch (e: Exception){
+                SnackbarManager.showErrorMessage(e.message ?: "Unknown error")
+                Log.e(ERROR_TAG, e.message ?: "Unknown error")
+            }
+
         }
     }
 
@@ -51,6 +73,7 @@ class SignInViewModel @Inject constructor(
                 openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
+                SnackbarManager.showErrorMessage(UNEXPECTED_CREDENTIAL)
             }
         }
     }

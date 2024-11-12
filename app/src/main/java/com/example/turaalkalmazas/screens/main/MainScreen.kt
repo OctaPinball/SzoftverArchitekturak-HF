@@ -2,9 +2,15 @@ package com.example.turaalkalmazas.screens.main
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarData
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
@@ -13,8 +19,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,7 +27,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
@@ -72,8 +78,23 @@ fun MainScreen(
             val snackbarHostState = remember { SnackbarHostState() }
             val appState = rememberAppState(snackbarHostState)
 
+            val dismissSnackbarOnTapModifier = Modifier.pointerInput(Unit) {
+                detectTapGestures {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                }
+            }
+
             androidx.compose.material3.Scaffold(
-                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+                modifier = dismissSnackbarOnTapModifier,
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState) { data ->
+                        val isError = (data.duration == SnackbarDuration.Long)
+                        Snackbar(
+                            snackbarData = data,
+                            backgroundColor = if (isError) Color.Red else MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
                 topBar = {
                     UserCard(userName = username, profileImage = Icons.Default.Person) {
                         appState.navigate(ACCOUNT_CENTER_SCREEN)

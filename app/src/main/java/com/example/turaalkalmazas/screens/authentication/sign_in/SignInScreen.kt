@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +52,7 @@ fun SignInScreen(
     viewModel: SignInViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     val email = viewModel.email.collectAsState()
     val password = viewModel.password.collectAsState()
@@ -119,7 +121,10 @@ fun SignInScreen(
             .padding(12.dp))
 
         Button(
-            onClick = { viewModel.onSignInClick(openAndPopUp) },
+            onClick = {
+                focusManager.clearFocus()
+                viewModel.onSignInClick(context, openAndPopUp)
+                      },
             colors = ButtonDefaults.buttonColors(containerColor = Purple40),
             modifier = modifier
                 .fillMaxWidth()

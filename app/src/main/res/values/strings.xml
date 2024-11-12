@@ -28,4 +28,10 @@
     <string name="routes">Routes</string>
     <string name="my_routes">My routes</string>
     <string name="friends">Friends</string>
+    <string name="email_empty">Email can\'t be empty</string>
+    <string name="password_empty">Password can\'t be empty</string>
+    <string name="invalid_email_format">Invalid email format</string>
+    <string name="invalid_password_format">Invalid password format</string>
+    <string name="passwords_not_match">Passwords do not match</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

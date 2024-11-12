@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +49,7 @@ fun SignUpScreen(
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
 
     val email = viewModel.email.collectAsState()
     val password = viewModel.password.collectAsState()
@@ -138,7 +140,10 @@ fun SignUpScreen(
             .padding(12.dp))
 
         Button(
-            onClick = { viewModel.onSignUpClick(openAndPopUp) },
+            onClick = {
+                focusManager.clearFocus()
+                viewModel.onSignUpClick(context, openAndPopUp)
+                      },
             colors = ButtonDefaults.buttonColors(containerColor = Purple40),
             modifier = modifier
                 .fillMaxWidth()

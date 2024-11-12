@@ -68,7 +68,7 @@ private suspend fun launchCredManButtonUI(
         onRequestResult(result.credential)
     } catch (e: NoCredentialException) {
         Log.d(ERROR_TAG, e.message.orEmpty())
-        SnackbarManager.showMessage(context.getString(R.string.no_accounts_error))
+        SnackbarManager.showErrorMessage(context.getString(R.string.no_accounts_error))
     } catch (e: GetCredentialException) {
         Log.d(ERROR_TAG, e.message.orEmpty())
     }
@@ -97,7 +97,6 @@ suspend fun launchCredManBottomSheet(
         onRequestResult(result.credential)
     } catch (e: NoCredentialException) {
         Log.d(ERROR_TAG, e.message.orEmpty())
-
         //If the bottom sheet was launched with filter by authorized accounts, we launch it again
         //without filter so the user can see all available accounts, not only the ones that have
         //been previously authorized in this app
@@ -105,6 +104,7 @@ suspend fun launchCredManBottomSheet(
             launchCredManBottomSheet(context, hasFilter = false, onRequestResult)
         }
     } catch (e: GetCredentialException) {
+        //No snackbar error needed
         Log.d(ERROR_TAG, e.message.orEmpty())
     }
 }

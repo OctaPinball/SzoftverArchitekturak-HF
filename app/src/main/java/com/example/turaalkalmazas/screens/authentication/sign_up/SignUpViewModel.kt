@@ -1,12 +1,15 @@
 package com.example.turaalkalmazas.screens.authentication.sign_up
 
+import android.content.Context
 import android.util.Log
 import androidx.credentials.Credential
 import androidx.credentials.CustomCredential
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.ERROR_TAG
 import com.example.turaalkalmazas.MAP_SCREEN
+import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.SIGN_UP_SCREEN
+import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.UNEXPECTED_CREDENTIAL
 import com.example.turaalkalmazas.screens.authentication.isValidEmail
 import com.example.turaalkalmazas.screens.authentication.isValidPassword
@@ -45,22 +48,34 @@ class SignUpViewModel @Inject constructor(
         _confirmPassword.value = newConfirmPassword
     }
 
-    fun onSignUpClick(openAndPopUp: (String, String) -> Unit) {
+    fun onSignUpClick(context: Context, openAndPopUp: (String, String) -> Unit) {
         launchCatching {
             if (!_email.value.isValidEmail()) {
-                throw IllegalArgumentException("Invalid email format")
+                SnackbarManager.showErrorMessage(context.getString(R.string.invalid_email_format))
+                Log.e(ERROR_TAG, context.getString(R.string.invalid_email_format))
+                throw IllegalArgumentException(context.getString(R.string.invalid_email_format))
             }
 
             if (!_password.value.isValidPassword()) {
-                throw IllegalArgumentException("Invalid password format")
+                SnackbarManager.showErrorMessage(context.getString(R.string.invalid_password_format))
+                Log.e(ERROR_TAG, context.getString(R.string.invalid_password_format))
+                throw IllegalArgumentException(context.getString(R.string.invalid_password_format))
             }
 
             if (_password.value != _confirmPassword.value) {
-                throw IllegalArgumentException("Passwords do not match")
+                SnackbarManager.showErrorMessage(context.getString(R.string.passwords_not_match))
+                Log.e(ERROR_TAG, context.getString(R.string.passwords_not_match))
+                throw IllegalArgumentException(context.getString(R.string.passwords_not_match))
             }
 
-            accountService.linkAccountWithEmail(_email.value, _password.value)
-            openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
+            try {
+                accountService.linkAccountWithEmail(_email.value, _password.value)
+                openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
+            }
+            catch (e: Exception){
+                SnackbarManager.showErrorMessage(e.message ?: "Unknown error")
+                Log.e(ERROR_TAG, e.message ?: "Unknown error")
+            }
         }
     }
 

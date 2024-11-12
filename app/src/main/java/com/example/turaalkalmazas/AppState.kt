@@ -1,8 +1,10 @@
 package com.example.turaalkalmazas
 
+
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Stable
 import androidx.navigation.NavHostController
-import androidx.compose.material3.SnackbarHostState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
@@ -17,7 +19,11 @@ class AppState(
     init {
         coroutineScope.launch {
             snackbarManager.snackbarMessages.filterNotNull().collect { message ->
-                snackbarHostState.showSnackbar(message)
+                val isError = message is SnackbarMessage.Error
+                val result = snackbarHostState.showSnackbar(
+                    message.text,
+                    duration = if (isError) SnackbarDuration.Long else SnackbarDuration.Short
+                )
                 snackbarManager.clearSnackbarState()
             }
         }
