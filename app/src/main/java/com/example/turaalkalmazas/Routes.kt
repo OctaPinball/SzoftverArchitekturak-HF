@@ -8,6 +8,8 @@ const val MAP_SCREEN = "MapScreen"
 const val ROUTES_SCREEN = "RoutesScreen"
 const val MY_ROUTES_SCREEN = "MyRoutesScreen"
 const val FRIENDS_SCREEN = "FriendsScreen"
+const val ADD_FRIENDS_SCREEN = "AddFriendsScreen"
+const val FRIEND_REQUEST_SCREEN = "FriendRequestScreen"
 
 const val NOTE_ID = "noteId"
 const val NOTE_DEFAULT_ID = "-1"

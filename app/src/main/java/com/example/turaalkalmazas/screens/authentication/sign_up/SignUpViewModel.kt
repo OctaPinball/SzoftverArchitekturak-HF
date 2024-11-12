@@ -48,7 +48,7 @@ class SignUpViewModel @Inject constructor(
         _confirmPassword.value = newConfirmPassword
     }
 
-    fun onSignUpClick(context: Context, openAndPopUp: (String, String) -> Unit) {
+    fun onSignUpClick(context: Context, restartApp: (String) -> Unit) {
         launchCatching {
             if (!_email.value.isValidEmail()) {
                 SnackbarManager.showErrorMessage(context.getString(R.string.invalid_email_format))
@@ -70,7 +70,7 @@ class SignUpViewModel @Inject constructor(
 
             try {
                 accountService.linkAccountWithEmail(_email.value, _password.value)
-                openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
+                restartApp(MAP_SCREEN)
             }
             catch (e: Exception){
                 SnackbarManager.showErrorMessage(e.message ?: "Unknown error")
@@ -79,12 +79,12 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun onSignUpWithGoogle(credential: Credential, openAndPopUp: (String, String) -> Unit) {
+    fun onSignUpWithGoogle(credential: Credential, restartApp: (String) -> Unit) {
         launchCatching {
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.linkAccountWithGoogle(googleIdTokenCredential.idToken)
-                openAndPopUp(MAP_SCREEN, SIGN_UP_SCREEN)
+                restartApp(MAP_SCREEN)
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
             }

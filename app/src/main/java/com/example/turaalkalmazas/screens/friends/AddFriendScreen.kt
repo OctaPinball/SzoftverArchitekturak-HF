@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,23 +20,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.ADD_FRIENDS_SCREEN
 import com.example.turaalkalmazas.FRIENDS_SCREEN
 import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
-import com.example.turaalkalmazas.screens.main.BottomNavigationBar
 import com.example.turaalkalmazas.ui.theme.Theme
-import com.google.firebase.annotations.concurrent.Background
 
 @Composable
-fun FriendsScreen(
+fun AddFriendsScreen(
     openScreen: (String) -> Unit,
     openAndPopUp: (String, String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FriendsViewModel = hiltViewModel()
+    viewModel: AddFriendViewModel = hiltViewModel()
 ) {
     Theme {
         Surface(color = MaterialTheme.colorScheme.background) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                TopNavigationFriends(openScreen)
+                TopNavigationAddFriends(openScreen)
 
                 Text(
                     text = "Friends Screen",
@@ -52,17 +49,17 @@ fun FriendsScreen(
 }
 
 @Composable
-fun TopNavigationFriends(openScreen: (String) -> Unit) {
+fun TopNavigationAddFriends(openScreen: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        Button(onClick = { openScreen(FRIENDS_SCREEN) }, colors = ButtonDefaults.buttonColors(Color.Blue)) {
+        Button(onClick = { openScreen(FRIENDS_SCREEN) }) {
             Text(text = "Friends")
         }
-        Button(onClick = { openScreen(ADD_FRIENDS_SCREEN) }) {
+        Button(onClick = { openScreen(ADD_FRIENDS_SCREEN) }, colors = ButtonDefaults.buttonColors(Color.Blue)) {
             Text(text = "Add Friend")
         }
         Button(onClick = { openScreen(FRIEND_REQUEST_SCREEN) }) {

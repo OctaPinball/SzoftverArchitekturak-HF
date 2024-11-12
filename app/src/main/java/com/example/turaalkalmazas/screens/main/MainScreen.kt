@@ -37,8 +37,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.turaalkalmazas.ACCOUNT_CENTER_SCREEN
+import com.example.turaalkalmazas.ADD_FRIENDS_SCREEN
 import com.example.turaalkalmazas.AppState
 import com.example.turaalkalmazas.FRIENDS_SCREEN
+import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
 import com.example.turaalkalmazas.MAP_SCREEN
 import com.example.turaalkalmazas.MY_ROUTES_SCREEN
 import com.example.turaalkalmazas.R
@@ -51,6 +53,8 @@ import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.screens.account_center.AccountCenterScreen
 import com.example.turaalkalmazas.screens.authentication.sign_in.SignInScreen
 import com.example.turaalkalmazas.screens.authentication.sign_up.SignUpScreen
+import com.example.turaalkalmazas.screens.friends.AddFriendsScreen
+import com.example.turaalkalmazas.screens.friends.FriendRequestScreen
 import com.example.turaalkalmazas.screens.friends.FriendsScreen
 import com.example.turaalkalmazas.screens.map.MapScreen
 import com.example.turaalkalmazas.screens.myroutes.MyRoutesScreen
@@ -142,15 +146,29 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
         )
     }
 
-    composable(SIGN_IN_SCREEN) {
-        SignInScreen(
+    composable(ADD_FRIENDS_SCREEN){
+        AddFriendsScreen(
             openScreen = { route -> appState.navigate(route) },
             openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
         )
     }
 
+    composable(FRIEND_REQUEST_SCREEN){
+        FriendRequestScreen(
+            openScreen = { route -> appState.navigate(route) },
+            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
+        )
+    }
+
+    composable(SIGN_IN_SCREEN) {
+        SignInScreen(
+            openScreen = { route -> appState.navigate(route) },
+            restartApp = { route -> appState.clearAndNavigate(route) }
+        )
+    }
+
     composable(SIGN_UP_SCREEN) {
-        SignUpScreen(openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) })
+        SignUpScreen(restartApp = { route -> appState.clearAndNavigate(route) })
     }
 
     composable(SPLASH_SCREEN) {
@@ -158,7 +176,10 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 
     composable(ACCOUNT_CENTER_SCREEN) {
-        AccountCenterScreen(restartApp = { route -> appState.clearAndNavigate(route) })
+        AccountCenterScreen(
+            openScreen = { route -> appState.navigate(route) },
+            restartApp = { route -> appState.clearAndNavigate(route) }
+        )
     }
 }
 

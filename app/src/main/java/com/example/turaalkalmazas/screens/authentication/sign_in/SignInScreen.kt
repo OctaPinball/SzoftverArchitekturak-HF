@@ -32,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,7 +46,7 @@ import com.example.turaalkalmazas.ui.theme.Theme
 @OptIn(ExperimentalMaterial3Api::class)
 fun SignInScreen(
     openScreen: (String) -> Unit,
-    openAndPopUp: (String, String) -> Unit,
+    restartApp: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
@@ -59,112 +58,129 @@ fun SignInScreen(
 
     LaunchedEffect(Unit) {
         launchCredManBottomSheet(context) { result ->
-            viewModel.onSignInWithGoogle(result, openAndPopUp)
+            viewModel.onSignInWithGoogle(result, restartApp)
         }
     }
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp))
-
-        OutlinedTextField(
-            singleLine = true,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp, 4.dp)
-                .border(
-                    BorderStroke(width = 2.dp, color = Purple40),
-                    shape = RoundedCornerShape(50)
-                ),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            value = email.value,
-            onValueChange = { viewModel.updateEmail(it) },
-            placeholder = { Text(stringResource(R.string.email)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = "Email") }
-        )
-
-        OutlinedTextField(
-            singleLine = true,
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp, 4.dp)
-                .border(
-                    BorderStroke(width = 2.dp, color = Purple40),
-                    shape = RoundedCornerShape(50)
-                ),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            value = password.value,
-            onValueChange = { viewModel.updatePassword(it) },
-            placeholder = { Text(stringResource(R.string.password)) },
-            leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = "Email") },
-            visualTransformation = PasswordVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp))
-
-        Button(
-            onClick = {
-                focusManager.clearFocus()
-                viewModel.onSignInClick(context, openAndPopUp)
-                      },
-            colors = ButtonDefaults.buttonColors(containerColor = Purple40),
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(16.dp, 0.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.sign_in),
-                fontSize = 16.sp,
-                modifier = modifier.padding(0.dp, 6.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp))
-
-        Text(text = stringResource(R.string.or), fontSize = 16.sp, color = Purple40)
-
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp))
-
-        AuthenticationButton(buttonText = R.string.sign_in_with_google) { credential ->
-            viewModel.onSignInWithGoogle(credential, openAndPopUp)
-        }
-
-        Spacer(modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp))
-
-        TextButton(onClick = { openScreen(SIGN_UP_SCREEN) }) {
-            Text(text = stringResource(R.string.sign_up_description), fontSize = 16.sp, color = Purple40)
-        }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AuthPreview() {
     Theme {
-        SignInScreen({}, { _, _ -> })
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            )
+
+            OutlinedTextField(
+                singleLine = true,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 4.dp)
+                    .border(
+                        BorderStroke(width = 2.dp, color = Purple40),
+                        shape = RoundedCornerShape(50)
+                    ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                value = email.value,
+                onValueChange = { viewModel.updateEmail(it) },
+                placeholder = { Text(stringResource(R.string.email)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Email"
+                    )
+                }
+            )
+
+            OutlinedTextField(
+                singleLine = true,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 4.dp)
+                    .border(
+                        BorderStroke(width = 2.dp, color = Purple40),
+                        shape = RoundedCornerShape(50)
+                    ),
+                colors = TextFieldDefaults.textFieldColors(
+                    containerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                value = password.value,
+                onValueChange = { viewModel.updatePassword(it) },
+                placeholder = { Text(stringResource(R.string.password)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = "Email"
+                    )
+                },
+                visualTransformation = PasswordVisualTransformation()
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp)
+            )
+
+            Button(
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.onSignInClick(context, restartApp)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 0.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_in),
+                    fontSize = 16.sp,
+                    modifier = modifier.padding(0.dp, 6.dp)
+                )
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            Text(text = stringResource(R.string.or), fontSize = 16.sp, color = Purple40)
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            AuthenticationButton(buttonText = R.string.sign_in_with_google) { credential ->
+                viewModel.onSignInWithGoogle(credential, restartApp)
+            }
+
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
+
+            TextButton(onClick = { openScreen(SIGN_UP_SCREEN) }) {
+                Text(
+                    text = stringResource(R.string.sign_up_description),
+                    fontSize = 16.sp,
+                    color = Purple40
+                )
+            }
+        }
     }
 }

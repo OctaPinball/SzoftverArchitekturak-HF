@@ -40,7 +40,7 @@ class SignInViewModel @Inject constructor(
         _password.value = newPassword
     }
 
-    fun onSignInClick(context: Context, openAndPopUp: (String, String) -> Unit) {
+    fun onSignInClick(context: Context, restartApp: (String) -> Unit) {
         launchCatching {
             if (_email.value.isBlank()) {
                 SnackbarManager.showErrorMessage(context.getString(R.string.email_empty))
@@ -55,7 +55,7 @@ class SignInViewModel @Inject constructor(
             try
             {
                 accountService.signInWithEmail(_email.value, _password.value)
-                openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
+                restartApp(MAP_SCREEN)
             }
             catch (e: Exception){
                 SnackbarManager.showErrorMessage(e.message ?: "Unknown error")
@@ -65,12 +65,12 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    fun onSignInWithGoogle(credential: Credential, openAndPopUp: (String, String) -> Unit) {
+    fun onSignInWithGoogle(credential: Credential, restartApp: (String) -> Unit) {
         launchCatching {
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 accountService.signInWithGoogle(googleIdTokenCredential.idToken)
-                openAndPopUp(MAP_SCREEN, SIGN_IN_SCREEN)
+                restartApp(MAP_SCREEN)
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
                 SnackbarManager.showErrorMessage(UNEXPECTED_CREDENTIAL)
