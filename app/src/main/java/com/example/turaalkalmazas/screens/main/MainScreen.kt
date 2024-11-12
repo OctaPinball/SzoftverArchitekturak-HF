@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarDuration
 import androidx.compose.material.SnackbarHost
@@ -30,11 +31,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.turaalkalmazas.ACCOUNT_CENTER_SCREEN
 import com.example.turaalkalmazas.ADD_FRIENDS_SCREEN
@@ -94,12 +98,18 @@ fun MainScreen(
                     }
                 },
                 topBar = {
-                    UserCard(userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
-                        profileImage = Icons.Default.Person) {
-                        appState.navigate(ACCOUNT_CENTER_SCREEN)
+                    Surface(
+                        color = MaterialTheme.colorScheme.primary) {
+                        UserCard(
+                            userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
+                            profileImage = Icons.Default.Person
+                        ) {
+                            appState.navigate(ACCOUNT_CENTER_SCREEN)
+
+                        }
                     }
                 },
-                bottomBar = { BottomNavigationBar(openScreen = { route -> appState.clearAndNavigate(route) }) }
+                bottomBar = { BottomNavigationBar(appState.navController, openScreen = { route -> appState.clearAndNavigate(route) }) }
             ) { innerPaddingModifier ->
                 NavHost(
                     navController = appState.navController,
@@ -191,7 +201,7 @@ sealed class BottomNavScreen(val route: String, @StringRes val label: Int, val i
 }
 
 @Composable
-fun BottomNavigationBar(openScreen: (String) -> Unit) {
+fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Unit) {
     val screens = listOf(
         BottomNavScreen.Map,
         BottomNavScreen.Routes,
@@ -199,16 +209,36 @@ fun BottomNavigationBar(openScreen: (String) -> Unit) {
         BottomNavScreen.Friends
     )
 
-    BottomNavigation {
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    BottomNavigation(
+        backgroundColor = MaterialTheme.colorScheme.background
+    ) {
         screens.forEach { screen ->
             BottomNavigationItem(
-                icon = { Icon(screen.icon, contentDescription = null)  },
-                label = { Text(text = stringResource(id = screen.label)) },
-                selected = false,
+                icon = {
+                    Icon(
+                        screen.icon,
+                        contentDescription = null,
+                        tint = if (currentRoute == screen.route) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(id = screen.label),
+                        color = if (currentRoute == screen.route) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                        fontWeight = if (currentRoute == screen.route) FontWeight.ExtraBold else FontWeight.Normal,
+                    )
+                },
+                selected = currentRoute == screen.route,
                 onClick = {
-                    openScreen(screen.route)
-                }
+                    if (currentRoute != screen.route) {
+                        openScreen(screen.route)
+                    }
+                },
             )
         }
     }
 }
+

@@ -2,7 +2,6 @@ package com.example.turaalkalmazas.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -43,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 fun Theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -59,7 +58,7 @@ fun Theme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = context.getColor(R.color.purple_400)
+            window.statusBarColor = colorScheme.primary.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }

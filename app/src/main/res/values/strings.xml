@@ -25,8 +25,8 @@
     <string name="update">Update</string>
     <string name="or">or</string>
     <string name="map">Map</string>
-    <string name="routes">Routes</string>
-    <string name="my_routes">My routes</string>
+    <string name="routes">Paths</string>
+    <string name="my_routes">My paths</string>
     <string name="friends">Friends</string>
     <string name="email_empty">Email can\'t be empty</string>
     <string name="password_empty">Password can\'t be empty</string>
