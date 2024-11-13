@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.turaalkalmazas.FRIENDS_SCREEN
 import com.example.turaalkalmazas.ui.theme.Theme
 
 @Composable
@@ -26,8 +25,6 @@ fun FriendsScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                TopNavigationFriends(openScreen, FRIENDS_SCREEN)
-
                 Text(
                     text = "Friends Screen",
                     modifier = Modifier

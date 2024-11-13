@@ -3,6 +3,7 @@ package com.example.turaalkalmazas.screens.main
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -60,6 +61,7 @@ import com.example.turaalkalmazas.screens.authentication.sign_up.SignUpScreen
 import com.example.turaalkalmazas.screens.friends.AddFriendsScreen
 import com.example.turaalkalmazas.screens.friends.FriendRequestScreen
 import com.example.turaalkalmazas.screens.friends.FriendsScreen
+import com.example.turaalkalmazas.screens.friends.TopNavigationFriends
 import com.example.turaalkalmazas.screens.map.MapScreen
 import com.example.turaalkalmazas.screens.myroutes.MyRoutesScreen
 import com.example.turaalkalmazas.screens.routes.RoutesScreen
@@ -80,6 +82,9 @@ fun MainScreen(
             val snackbarHostState = remember { SnackbarHostState() }
             val appState = rememberAppState(snackbarHostState)
 
+            val currentBackStackEntry by appState.navController.currentBackStackEntryAsState()
+            val currentRoute = currentBackStackEntry?.destination?.route
+
             val dismissSnackbarOnTapModifier = Modifier.pointerInput(Unit) {
                 detectTapGestures {
                     snackbarHostState.currentSnackbarData?.dismiss()
@@ -98,14 +103,22 @@ fun MainScreen(
                     }
                 },
                 topBar = {
-                    Surface(
-                        color = MaterialTheme.colorScheme.primary) {
-                        UserCard(
-                            userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
-                            profileImage = Icons.Default.Person
+                    Column {
+                        Surface(
+                            color = MaterialTheme.colorScheme.primary
                         ) {
-                            appState.navigate(ACCOUNT_CENTER_SCREEN)
-
+                            UserCard(
+                                userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
+                                profileImage = Icons.Default.Person
+                            ) {
+                                appState.navigate(ACCOUNT_CENTER_SCREEN)
+                            }
+                        }
+                        if (currentRoute != null && (currentRoute == FRIENDS_SCREEN || currentRoute == ADD_FRIENDS_SCREEN || currentRoute == FRIEND_REQUEST_SCREEN)) {
+                            TopNavigationFriends(
+                                openScreen = { route -> appState.navigate(route) },
+                                currentRoute
+                            )
                         }
                     }
                 },
@@ -193,12 +206,17 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 }
 
-sealed class BottomNavScreen(val route: String, @StringRes val label: Int, val icon: ImageVector) {
-    object Map : BottomNavScreen(MAP_SCREEN, R.string.map, Icons.Default.Home)
-    object Routes : BottomNavScreen(ROUTES_SCREEN, R.string.routes, Icons.Default.Search)
-    object MyRoutes : BottomNavScreen(MY_ROUTES_SCREEN, R.string.my_routes, Icons.Default.Menu)
-    object Friends : BottomNavScreen(FRIENDS_SCREEN, R.string.friends, Icons.Default.Person)
+sealed class BottomNavScreen(val routes: List<String>, @StringRes val label: Int, val icon: ImageVector) {
+    object Map : BottomNavScreen(listOf(MAP_SCREEN), R.string.map, Icons.Default.Home)
+    object Routes : BottomNavScreen(listOf(ROUTES_SCREEN), R.string.routes, Icons.Default.Search)
+    object MyRoutes : BottomNavScreen(listOf(MY_ROUTES_SCREEN), R.string.my_routes, Icons.Default.Menu)
+    object Friends : BottomNavScreen(
+        listOf(FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN, ADD_FRIENDS_SCREEN),
+        R.string.friends,
+        Icons.Default.Person
+    )
 }
+
 
 @Composable
 fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Unit) {
@@ -221,20 +239,20 @@ fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Un
                     Icon(
                         screen.icon,
                         contentDescription = null,
-                        tint = if (currentRoute == screen.route) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                        tint = if (screen.routes.contains(currentRoute)) MaterialTheme.colorScheme.primary else LocalContentColor.current
                     )
                 },
                 label = {
                     Text(
                         text = stringResource(id = screen.label),
-                        color = if (currentRoute == screen.route) MaterialTheme.colorScheme.primary else LocalContentColor.current,
-                        fontWeight = if (currentRoute == screen.route) FontWeight.ExtraBold else FontWeight.Normal,
+                        color = if (screen.routes.contains(currentRoute)) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+                        fontWeight = if (screen.routes.contains(currentRoute)) FontWeight.ExtraBold else FontWeight.Normal,
                     )
                 },
-                selected = currentRoute == screen.route,
+                selected = (screen.routes.contains(currentRoute)),
                 onClick = {
-                    if (currentRoute != screen.route) {
-                        openScreen(screen.route)
+                    if (!screen.routes.contains(currentRoute)) {
+                        openScreen(screen.routes[0])
                     }
                 },
             )
