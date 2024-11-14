@@ -75,7 +75,7 @@ fun TopNavigationFriends(openScreen: (String) -> Unit, selectedButton: String) {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TopNavButton(FRIENDS_SCREEN, Icons.Default.Person, stringResource(R.string.friends))
-            TopNavButton(ADD_FRIENDS_SCREEN, Icons.Default.Add, stringResource(R.string.add_friends))
+            TopNavButton(ADD_FRIENDS_SCREEN, Icons.Default.Add, stringResource(R.string.add))
             TopNavButton(FRIEND_REQUEST_SCREEN, Icons.Default.ArrowForward, stringResource(R.string.friend_request))
         }
     }
