@@ -41,10 +41,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.turaalkalmazas.ACCOUNT_CENTER_SCREEN
 import com.example.turaalkalmazas.ADD_FRIENDS_SCREEN
 import com.example.turaalkalmazas.AppState
 import com.example.turaalkalmazas.FRIENDS_SCREEN
+import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
 import com.example.turaalkalmazas.MAP_SCREEN
 import com.example.turaalkalmazas.MY_ROUTES_SCREEN
@@ -54,11 +56,15 @@ import com.example.turaalkalmazas.SIGN_IN_SCREEN
 import com.example.turaalkalmazas.SIGN_UP_SCREEN
 import com.example.turaalkalmazas.SPLASH_SCREEN
 import com.example.turaalkalmazas.SnackbarManager
+import com.example.turaalkalmazas.USER_DEFAULT_ID
+import com.example.turaalkalmazas.USER_ID
+import com.example.turaalkalmazas.USER_ID_ARG
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.screens.account_center.AccountCenterScreen
 import com.example.turaalkalmazas.screens.authentication.sign_in.SignInScreen
 import com.example.turaalkalmazas.screens.authentication.sign_up.SignUpScreen
 import com.example.turaalkalmazas.screens.friends.AddFriendsScreen
+import com.example.turaalkalmazas.screens.friends.FriendDetailsScreen
 import com.example.turaalkalmazas.screens.friends.FriendRequestScreen
 import com.example.turaalkalmazas.screens.friends.FriendsScreen
 import com.example.turaalkalmazas.screens.friends.TopNavigationFriends
@@ -179,7 +185,18 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     composable(FRIEND_REQUEST_SCREEN){
         FriendRequestScreen(
             openScreen = { route -> appState.navigate(route) },
-            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) }
+            openAndPopUp = { route, popUp -> appState.navigateAndPopUp(route, popUp) },
+        )
+    }
+
+    composable(
+        route = "$FRIEND_DETAILS_SCREEN$USER_ID_ARG",
+        arguments = listOf(navArgument(USER_ID) { defaultValue = USER_DEFAULT_ID })
+    ) {
+        FriendDetailsScreen(
+            userId = it.arguments?.getString(USER_ID) ?: USER_DEFAULT_ID,
+            popUpScreen = { appState.popUp() },
+            restartApp = { route -> appState.clearAndNavigate(route) }
         )
     }
 

@@ -40,4 +40,6 @@
     <string name="search">Search</string>
     <string name="accept">Accept</string>
     <string name="reject">Reject</string>
+    <string name="added">Added</string>
+    <string name="view">View</string>
 </resources>

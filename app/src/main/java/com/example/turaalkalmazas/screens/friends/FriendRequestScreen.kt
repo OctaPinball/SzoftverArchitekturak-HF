@@ -13,9 +13,12 @@ import com.example.turaalkalmazas.ui.theme.Theme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.model.User
 
@@ -26,7 +29,7 @@ fun FriendRequestScreen(
     openScreen: (String) -> Unit,
     openAndPopUp: (String, String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FriendRequestViewModel = hiltViewModel()
+    viewModel: FriendRequestViewModel = hiltViewModel(),
 ) {
     val friendRequests by viewModel.users.collectAsState()
 
@@ -35,13 +38,14 @@ fun FriendRequestScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
                 items(friendRequests) { user ->
                     FriendRequestItem(
                         user = user,
                         accept = {userId -> viewModel.onAcceptClick(userId)},
-                        reject = {userId -> viewModel.onRejectClick(userId)})
+                        reject = {userId -> viewModel.onRejectClick(userId)},
+                    )
                 }
             }
         }
@@ -75,26 +79,31 @@ fun FriendRequestItem(user: User, accept: (String) -> Unit, reject: (String) -> 
             ) {
                 Text(
                     text = user.displayName,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = user.email,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+            Spacer(modifier = Modifier.width(4.dp))
             Row {
                 Button(
-                    onClick = { accept(user.id) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text(stringResource(R.string.accept))
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
                     onClick = { reject(user.id) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 ) {
-                    Text(stringResource(R.string.reject))
+                    Icon(Icons.Default.Close, contentDescription = "Reject")
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                Button(
+                    onClick = { accept(user.id) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                ) {
+                    Icon(Icons.Default.Check, contentDescription = "Accept")
                 }
             }
         }

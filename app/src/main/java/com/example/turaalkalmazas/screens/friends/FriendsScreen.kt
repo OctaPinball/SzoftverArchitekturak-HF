@@ -33,9 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.R
+import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.ui.theme.Theme
 
@@ -62,7 +65,8 @@ fun FriendsScreen(
                     value = searchQuery,
                     onValueChange = {
                         searchQuery = it
-                        viewModel.onSearchValueChange(it.text)
+                        viewModel.searchQuery = it.text
+                        viewModel.onSearchValueChange()
                     },
                     label = { Text(stringResource(R.string.search)) },
                     modifier = Modifier
@@ -75,7 +79,7 @@ fun FriendsScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(friends) { user ->
-                        FriendItem(name = user.displayName, Icons.Default.Person)
+                        FriendItem(user = user, openScreen = {route -> openScreen(route)})
                     }
                 }
             }
@@ -84,7 +88,7 @@ fun FriendsScreen(
 }
 
 @Composable
-fun FriendItem(name: String, profileImage: ImageVector) {
+fun FriendItem(user: User, openScreen: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,7 +102,7 @@ fun FriendItem(name: String, profileImage: ImageVector) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = profileImage,
+                imageVector = Icons.Default.Person,
                 contentDescription = "Profile Image",
                 modifier = Modifier.size(40.dp)
             )
@@ -109,16 +113,20 @@ fun FriendItem(name: String, profileImage: ImageVector) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = name,
+                    text = user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = name,
+                    text = user.email,
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            Button(onClick = { /* Itt történhet a barát hozzáadása */ }) {
-                Text(stringResource(R.string.add))
+            Button(onClick = {openScreen("$FRIEND_DETAILS_SCREEN?$USER_ID=${user.id}")}) {
+                Text(stringResource(R.string.view))
             }
         }
     }

@@ -98,21 +98,6 @@ class AccountServiceImpl @Inject constructor(
         firestore.collection("users").document(userId).delete().await()
     }
 
-    override suspend fun searchUser(query: String): List<User> = withContext(Dispatchers.IO) {
-        val users = mutableListOf<User>()
-
-        val userQuery = firestore.collection("users")
-            .whereArrayContains("keywords", query.lowercase())
-            .get()
-            .await()
-
-        for (doc in userQuery.documents) {
-            doc.toObject(User::class.java)?.let { users.add(it) }
-        }
-
-        users
-    }
-
     private suspend fun saveUserToFirestore(user: FirebaseUser) {
         val userDoc = firestore.collection("users").document(user.uid)
         val email = user.email.orEmpty()

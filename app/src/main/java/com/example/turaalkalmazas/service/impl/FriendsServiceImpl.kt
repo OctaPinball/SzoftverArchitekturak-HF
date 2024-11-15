@@ -1,6 +1,8 @@
 package com.example.turaalkalmazas.service.impl
 
 import com.example.turaalkalmazas.model.User
+import com.example.turaalkalmazas.model.UserRelation
+import com.example.turaalkalmazas.model.UserRelationType
 import com.example.turaalkalmazas.service.FriendsService
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -59,6 +61,21 @@ class FriendsServiceImpl @Inject constructor(
         users
     }
 
+    override suspend fun getAllOutRequests(userId: String): List<User> = withContext(Dispatchers.IO) {
+        val userDocRef = firestore.collection("users").document(userId)
+        val userSnapshot = userDocRef.get().await()
+
+        val requestIds = userSnapshot.get("requests_out") as? List<String> ?: emptyList()
+
+        val users = mutableListOf<User>()
+        for (requestId in requestIds) {
+            val friendDocRef = firestore.collection("users").document(requestId)
+            friendDocRef.get().await().toObject(User::class.java)?.let { users.add(it) }
+        }
+
+        users
+    }
+
     override suspend fun getAllFriends(userId: String): List<User> = withContext(Dispatchers.IO){
         val userDocRef = firestore.collection("users").document(userId)
         val userSnapshot = userDocRef.get().await()
@@ -74,4 +91,56 @@ class FriendsServiceImpl @Inject constructor(
         friends
     }
 
+    override suspend fun searchUserToAdd(query: String, userId: String): List<UserRelation> = withContext(Dispatchers.IO) {
+        val users = mutableListOf<UserRelation>()
+
+        users.addAll(
+            searchUser(query).map { user ->
+                UserRelation(user = user, relationType = UserRelationType.NONE)
+            }
+        )
+
+        users.removeAll { it.user.id == userId }
+
+        val friends = getAllFriends(userId)
+        users.removeAll { friends.contains(it.user) }
+
+
+        val outRequests = getAllOutRequests(userId)
+        users.forEach { userRelation ->
+            if (outRequests.any { friend -> friend.id == userRelation.user.id }) {
+                userRelation.relationType = UserRelationType.OUT_REQUEST
+            }
+        }
+
+        val inRequests = getAllInRequests(userId)
+        users.forEach { userRelation ->
+            if (inRequests.any { friend -> friend.id == userRelation.user.id }) {
+                userRelation.relationType = UserRelationType.IN_REQUEST
+            }
+        }
+
+        users
+    }
+
+    override suspend fun searchFriends(userId: String, search: String): List<User> = withContext(Dispatchers.IO) {
+        val friends = getAllFriends(userId)
+        val out = friends.filter { user -> user.displayName.contains(search, ignoreCase = true) || user.email.contains(search, ignoreCase = true) }
+        out
+    }
+
+    private suspend fun searchUser(query: String): List<User> {
+        val users = mutableListOf<User>()
+
+        val userQuery = firestore.collection("users")
+            .whereArrayContains("keywords", query.lowercase())
+            .get()
+            .await()
+
+        for (doc in userQuery.documents) {
+            doc.toObject(User::class.java)?.let { users.add(it) }
+        }
+
+        return users
+    }
 }

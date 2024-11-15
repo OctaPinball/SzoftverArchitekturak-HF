@@ -16,8 +16,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
 import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.model.User
+import com.example.turaalkalmazas.model.UserRelation
+import com.example.turaalkalmazas.model.UserRelationType
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +47,8 @@ fun AddFriendsScreen(
                     value = searchQuery,
                     onValueChange = {
                         searchQuery = it
-                        viewModel.onSearchValueChange(it.text)
+                        viewModel.searchQuery = it.text
+                        viewModel.onSearchValueChange()
                     },
                     label = { Text(stringResource(R.string.search)) },
                     modifier = Modifier
@@ -56,7 +61,11 @@ fun AddFriendsScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(friends) { user ->
-                        AddFriendItem(user = user, onAddButtonClick = {userid -> viewModel.onAddButtonClick(userid)})
+                        AddFriendItem(
+                            user = user,
+                            onAddButtonClick = {userid -> viewModel.onAddButtonClick(userid)},
+                            openScreen = {route -> openScreen(route)}
+                        )
                     }
                 }
             }
@@ -65,7 +74,7 @@ fun AddFriendsScreen(
 }
 
 @Composable
-fun AddFriendItem(user: User, onAddButtonClick: (String) -> Unit) {
+fun AddFriendItem(user: UserRelation, onAddButtonClick: (String) -> Unit, openScreen: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -90,18 +99,42 @@ fun AddFriendItem(user: User, onAddButtonClick: (String) -> Unit) {
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = user.displayName,
+                    text = user.user.displayName,
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = user.email,
+                    text = user.user.email,
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            Button(onClick = {
-                onAddButtonClick(user.id)
-            }) {
-                Text(stringResource(R.string.add))
+            when (user.relationType) {
+                UserRelationType.NONE -> {
+                    Button(onClick = {
+                        onAddButtonClick(user.user.id)
+                    }) {
+                        Text(stringResource(R.string.add))
+                    }
+                }
+                UserRelationType.IN_REQUEST -> {
+                    Button(onClick = {
+                        openScreen(FRIEND_REQUEST_SCREEN)
+                    }) {
+                        Text(stringResource(R.string.accept))
+                    }
+                }
+                UserRelationType.OUT_REQUEST -> {
+                    Button(
+                        enabled = false,
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                    ) {
+                        Text(stringResource(R.string.added))
+                    }
+                }
             }
         }
     }

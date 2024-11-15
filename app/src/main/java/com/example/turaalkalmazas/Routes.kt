@@ -10,10 +10,11 @@ const val MY_ROUTES_SCREEN = "MyRoutesScreen"
 const val FRIENDS_SCREEN = "FriendsScreen"
 const val ADD_FRIENDS_SCREEN = "AddFriendsScreen"
 const val FRIEND_REQUEST_SCREEN = "FriendRequestScreen"
+const val FRIEND_DETAILS_SCREEN = "FriendDetailsScreen"
 
-const val NOTE_ID = "noteId"
-const val NOTE_DEFAULT_ID = "-1"
-const val NOTE_ID_ARG = "?$NOTE_ID={$NOTE_ID}"
+const val USER_ID = "userId"
+const val USER_DEFAULT_ID = "-1"
+const val USER_ID_ARG = "?$USER_ID={$USER_ID}"
 
 const val LOCALHOST = "10.0.2.2"
 const val AUTH_PORT = 9099
