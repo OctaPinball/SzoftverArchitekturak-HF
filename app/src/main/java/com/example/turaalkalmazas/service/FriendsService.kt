@@ -13,5 +13,7 @@ interface FriendsService {
     suspend fun getAllOutRequests(userId: String) : List<User>
     suspend fun getAllFriends(userId: String): List<User>
     suspend fun searchUserToAdd(query: String, userId: String): List<UserRelation>
+    suspend fun getUserDetails(signedInUserId: String, userId: String): UserRelation
+    suspend fun removeFriend(userId: String, friendId: String)
     suspend fun searchFriends(userId: String, search: String): List<User>
 }

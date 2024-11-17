@@ -16,9 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
 import com.example.turaalkalmazas.R
+import com.example.turaalkalmazas.SIGN_IN_SCREEN
+import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.model.UserRelation
 import com.example.turaalkalmazas.model.UserRelationType
@@ -34,38 +38,67 @@ fun AddFriendsScreen(
 ) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     val friends by viewModel.users.collectAsState()
+    val user by viewModel.user.collectAsState()
 
 
     Theme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = {
-                        searchQuery = it
-                        viewModel.searchQuery = it.text
-                        viewModel.onSearchValueChange()
-                    },
-                    label = { Text(stringResource(R.string.search)) },
+        if (user.isAnonymous) {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    shape = RoundedCornerShape(30.dp)
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    items(friends) { user ->
-                        AddFriendItem(
-                            user = user,
-                            onAddButtonClick = {userid -> viewModel.onAddButtonClick(userid)},
-                            openScreen = {route -> openScreen(route)}
-                        )
+                    Text(
+                        text = stringResource(R.string.please_sign_in),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { openScreen(SIGN_IN_SCREEN) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(stringResource(R.string.sign_in))
+                    }
+                }
+            }
+
+        } else {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            searchQuery = it
+                            viewModel.searchQuery = it.text
+                            viewModel.onSearchValueChange()
+                        },
+                        label = { Text(stringResource(R.string.search)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(30.dp)
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(friends) { user ->
+                            AddFriendItem(
+                                user = user,
+                                onAddButtonClick = { userid -> viewModel.onAddButtonClick(userid) },
+                                openScreen = { route -> openScreen(route) }
+                            )
+                        }
                     }
                 }
             }
@@ -73,13 +106,15 @@ fun AddFriendsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFriendItem(user: UserRelation, onAddButtonClick: (String) -> Unit, openScreen: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = {openScreen("$FRIEND_DETAILS_SCREEN?$USER_ID=${user.user.id}")}
     ) {
         Row(
             modifier = Modifier
@@ -119,6 +154,7 @@ fun AddFriendItem(user: UserRelation, onAddButtonClick: (String) -> Unit, openSc
                         Text(stringResource(R.string.add))
                     }
                 }
+
                 UserRelationType.IN_REQUEST -> {
                     Button(onClick = {
                         openScreen(FRIEND_REQUEST_SCREEN)
@@ -126,6 +162,7 @@ fun AddFriendItem(user: UserRelation, onAddButtonClick: (String) -> Unit, openSc
                         Text(stringResource(R.string.accept))
                     }
                 }
+
                 UserRelationType.OUT_REQUEST -> {
                     Button(
                         enabled = false,
@@ -135,6 +172,8 @@ fun AddFriendItem(user: UserRelation, onAddButtonClick: (String) -> Unit, openSc
                         Text(stringResource(R.string.added))
                     }
                 }
+
+                UserRelationType.FRIEND -> {}//UNREACHABLE
             }
         }
     }

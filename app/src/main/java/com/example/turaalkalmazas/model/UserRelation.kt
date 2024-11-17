@@ -8,5 +8,6 @@ data class UserRelation (
 enum class UserRelationType {
     IN_REQUEST,
     OUT_REQUEST,
+    FRIEND,
     NONE,
 }

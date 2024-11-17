@@ -1,6 +1,8 @@
 package com.example.turaalkalmazas.service.impl
 
 
+import android.util.Log
+import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.service.AccountService
 import com.google.firebase.auth.FirebaseAuth
@@ -96,6 +98,7 @@ class AccountServiceImpl @Inject constructor(
         val userId = Firebase.auth.currentUser?.uid.orEmpty()
         Firebase.auth.currentUser!!.delete().await()
         firestore.collection("users").document(userId).delete().await()
+        removeFromEverywhere(userId)
     }
 
     private suspend fun saveUserToFirestore(user: FirebaseUser) {
@@ -123,6 +126,48 @@ class AccountServiceImpl @Inject constructor(
             }
         }
         return keywords.distinct()
+    }
+
+    private fun removeFromEverywhere(userId: String) {
+        val usersRef = firestore.collection("users")
+        val batch = firestore.batch()
+
+        usersRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val documentRef = usersRef.document(document.id)
+                    val data = document.data
+
+                    val updatedFriends = (data["friends"] as? List<String>)?.filterNot { it == userId }
+                    val updatedRequestsIn = (data["requests_in"] as? List<String>)?.filterNot { it == userId }
+                    val updatedRequestsOut = (data["requests_out"] as? List<String>)?.filterNot { it == userId }
+
+                    if (updatedFriends != data["friends"] ||
+                        updatedRequestsIn != data["requests_in"] ||
+                        updatedRequestsOut != data["requests_out"]) {
+
+                        batch.update(documentRef, mapOf(
+                            "friends" to updatedFriends,
+                            "requests_in" to updatedRequestsIn,
+                            "requests_out" to updatedRequestsOut
+                        ))
+                    }
+                }
+
+                // Batch commit
+                batch.commit()
+                    .addOnSuccessListener {
+                        Log.d("BatchUpdate", "Batch update successful")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("BatchUpdate", "Batch update failed: ${exception.message}")
+                        exception.message?.let { SnackbarManager.showErrorMessage(it) }
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("BatchUpdate", "Error getting documents: ${exception.message}")
+                exception.message?.let { SnackbarManager.showErrorMessage(it) }
+            }
     }
 
     private fun FirebaseUser?.toNotesUser(): User {

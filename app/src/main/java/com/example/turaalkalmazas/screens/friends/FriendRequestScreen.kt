@@ -18,8 +18,12 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.R
+import com.example.turaalkalmazas.SIGN_IN_SCREEN
+import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.model.User
 
 
@@ -32,33 +36,65 @@ fun FriendRequestScreen(
     viewModel: FriendRequestViewModel = hiltViewModel(),
 ) {
     val friendRequests by viewModel.users.collectAsState()
+    val user by viewModel.user.collectAsState()
 
     Theme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                items(friendRequests) { user ->
-                    FriendRequestItem(
-                        user = user,
-                        accept = {userId -> viewModel.onAcceptClick(userId)},
-                        reject = {userId -> viewModel.onRejectClick(userId)},
+        if (user.isAnonymous) {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.please_sign_in),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { openScreen(SIGN_IN_SCREEN) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(stringResource(R.string.sign_in))
+                    }
+                }
+            }
+
+        } else {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    items(friendRequests) { user ->
+                        FriendRequestItem(
+                            user = user,
+                            accept = { userId -> viewModel.onAcceptClick(userId) },
+                            reject = { userId -> viewModel.onRejectClick(userId) },
+                            openScreen = { route -> openScreen(route) }
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FriendRequestItem(user: User, accept: (String) -> Unit, reject: (String) -> Unit) {
+fun FriendRequestItem(user: User, accept: (String) -> Unit, reject: (String) -> Unit, openScreen: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        onClick = {openScreen("$FRIEND_DETAILS_SCREEN?$USER_ID=${user.id}")}
     ) {
         Row(
             modifier = Modifier

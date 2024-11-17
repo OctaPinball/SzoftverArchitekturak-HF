@@ -1,10 +1,13 @@
 package com.example.turaalkalmazas.screens.friends
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,14 +33,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.R
+import com.example.turaalkalmazas.SIGN_IN_SCREEN
 import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.ui.theme.Theme
@@ -52,34 +56,62 @@ fun FriendsScreen(
 ) {
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
     val friends by viewModel.users.collectAsState()
-
+    val user by viewModel.user.collectAsState()
 
     Theme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = {
-                        searchQuery = it
-                        viewModel.searchQuery = it.text
-                        viewModel.onSearchValueChange()
-                    },
-                    label = { Text(stringResource(R.string.search)) },
+        if (user.isAnonymous) {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 8.dp),
-                    shape = RoundedCornerShape(30.dp)
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
+                        .fillMaxSize()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    items(friends) { user ->
-                        FriendItem(user = user, openScreen = {route -> openScreen(route)})
+                    Text(
+                        text = stringResource(R.string.please_sign_in),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { openScreen(SIGN_IN_SCREEN) },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(stringResource(R.string.sign_in))
+                    }
+                }
+            }
+
+        } else {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = {
+                            searchQuery = it
+                            viewModel.searchQuery = it.text
+                            viewModel.onSearchValueChange()
+                        },
+                        label = { Text(stringResource(R.string.search)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(30.dp)
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(friends) { user ->
+                            FriendItem(user = user, openScreen = { route -> openScreen(route) })
+                        }
                     }
                 }
             }

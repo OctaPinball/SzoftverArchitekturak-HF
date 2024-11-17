@@ -1,5 +1,7 @@
 package com.example.turaalkalmazas.service.impl
 
+import android.util.Log
+import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.model.UserRelation
 import com.example.turaalkalmazas.model.UserRelationType
@@ -121,6 +123,33 @@ class FriendsServiceImpl @Inject constructor(
         }
 
         users
+    }
+
+    override suspend fun getUserDetails(signedInUserId: String, userId: String): UserRelation {
+        val userDocRef = firestore.collection("users").document(userId)
+        val user = userDocRef.get().await().toObject(User::class.java)
+            ?: throw Exception("User not found")
+
+        if(getAllFriends(signedInUserId).any { friend -> friend.id == userId }) {
+            return UserRelation(user = user, relationType = UserRelationType.FRIEND)
+        }
+        else if (getAllInRequests(signedInUserId).any { friend -> friend.id == userId }){
+            return UserRelation(user = user, relationType = UserRelationType.IN_REQUEST)
+        }
+        else if (getAllOutRequests(signedInUserId).any { friend -> friend.id == userId }){
+            return UserRelation(user = user, relationType = UserRelationType.OUT_REQUEST)
+        }
+        return UserRelation(user = user, relationType = UserRelationType.NONE)
+    }
+
+    override suspend fun removeFriend(userId: String, friendId: String) {
+        val userDocRef = firestore.collection("users").document(userId)
+        val friendDocRef = firestore.collection("users").document(friendId)
+
+        firestore.runTransaction { transaction ->
+            transaction.update(userDocRef, "friends", FieldValue.arrayRemove(friendId))
+            transaction.update(friendDocRef, "friends", FieldValue.arrayRemove(userId))
+        }
     }
 
     override suspend fun searchFriends(userId: String, search: String): List<User> = withContext(Dispatchers.IO) {

@@ -2,9 +2,16 @@ package com.example.turaalkalmazas.screens.main
 
 import android.annotation.SuppressLint
 import androidx.annotation.StringRes
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.LocalContentColor
@@ -27,12 +34,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -111,20 +120,34 @@ fun MainScreen(
                 topBar = {
                     Column {
                         Surface(
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = if(currentRoute in listOf(FRIENDS_SCREEN, ADD_FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN))
+                                RoundedCornerShape(0.dp)
+                            else RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)
                         ) {
                             UserCard(
-                                userName = if (user.isAnonymous) stringResource(R.string.click_to_log_in) else user.displayName,
+                                userName = if (user.isAnonymous) stringResource(R.string.sign_in) else user.displayName,
                                 profileImage = Icons.Default.Person
                             ) {
-                                appState.navigate(ACCOUNT_CENTER_SCREEN)
+                                if (user.isAnonymous) {
+                                    appState.navigate(SIGN_IN_SCREEN)
+                                } else {
+                                    appState.navigate(ACCOUNT_CENTER_SCREEN)
+                                }
                             }
                         }
-                        if (currentRoute != null && (currentRoute == FRIENDS_SCREEN || currentRoute == ADD_FRIENDS_SCREEN || currentRoute == FRIEND_REQUEST_SCREEN)) {
-                            TopNavigationFriends(
-                                openScreen = { route -> appState.navigate(route) },
-                                currentRoute
-                            )
+                        currentRoute?.let {
+                            if (currentRoute in listOf(
+                                    FRIENDS_SCREEN,
+                                    ADD_FRIENDS_SCREEN,
+                                    FRIEND_REQUEST_SCREEN
+                                )
+                            ) {
+                                TopNavigationFriends(
+                                    openScreen = { route -> appState.navigate(route) },
+                                    currentRoute
+                                )
+                            }
                         }
                     }
                 },
@@ -274,6 +297,25 @@ fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Un
                 },
             )
         }
+    }
+}
+
+@Composable
+fun UserCard(userName: String, profileImage: ImageVector, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = profileImage,
+            contentDescription = "Profile Image",
+            modifier = Modifier.size(40.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = userName, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
