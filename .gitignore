@@ -76,4 +76,4 @@ lint/tmp/
 app/release/output.json
 .idea/codeStyles/
 # secrets.properties
-secrets.properties
+# secrets.properties
