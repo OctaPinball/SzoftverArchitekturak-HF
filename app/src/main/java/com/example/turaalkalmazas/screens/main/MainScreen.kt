@@ -83,6 +83,12 @@ import com.example.turaalkalmazas.screens.routes.RoutesScreen
 import com.example.turaalkalmazas.screens.splash.SplashScreen
 import com.example.turaalkalmazas.ui.theme.Theme
 import kotlinx.coroutines.CoroutineScope
+import androidx.navigation.compose.rememberNavController
+import com.example.turaalkalmazas.ROUTE_DEFAULT_ID
+import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
+import com.example.turaalkalmazas.ROUTE_ID
+import com.example.turaalkalmazas.ROUTE_ID_ARG
+import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -184,7 +190,20 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 
     composable(ROUTES_SCREEN){
-        RoutesScreen()
+        RoutesScreen(
+            openScreen = { route -> appState.navigate(route) }
+        )
+    }
+
+    composable(
+        route = "$ROUTE_DETAIL_SCREEN$ROUTE_ID_ARG",
+        arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID })
+    ) {
+        RouteDetailScreen(
+            routeId = it.arguments?.getString(ROUTE_ID) ?: ROUTE_DEFAULT_ID,
+            popUpScreen = { appState.popUp() },
+            restartApp = { route -> appState.clearAndNavigate(route) }
+        )
     }
 
     composable(MY_ROUTES_SCREEN){
