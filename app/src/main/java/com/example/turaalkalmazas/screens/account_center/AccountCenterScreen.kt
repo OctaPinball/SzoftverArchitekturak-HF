@@ -140,7 +140,6 @@ fun DisplayNameCard(displayName: String, onUpdateDisplayNameClick: (String) -> U
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun AccountCenterCard(
     title: String,
     icon: ImageVector,

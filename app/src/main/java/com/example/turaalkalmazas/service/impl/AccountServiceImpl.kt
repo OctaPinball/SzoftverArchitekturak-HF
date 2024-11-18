@@ -9,19 +9,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.Firebase
 import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuthProvider
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withContext
-import java.util.Locale
 import javax.inject.Inject
 
 class AccountServiceImpl @Inject constructor(
@@ -32,7 +28,7 @@ class AccountServiceImpl @Inject constructor(
         get() = callbackFlow {
             val listener =
                 FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser.toNotesUser())
+                    this.trySend(auth.currentUser.toUser())
                 }
             Firebase.auth.addAuthStateListener(listener)
             awaitClose { Firebase.auth.removeAuthStateListener(listener) }
@@ -46,8 +42,34 @@ class AccountServiceImpl @Inject constructor(
     }
 
     override fun getUserProfile(): User {
-        return Firebase.auth.currentUser.toNotesUser()
+        return Firebase.auth.currentUser.toUser()
     }
+
+    override suspend fun getDetailedUserProfile(): User {
+        val userDocRef = firestore.collection("users").document(currentUserId)
+        val documentSnapshot = userDocRef.get().await()
+        Log.d("SuperLog Document", "Data: ${documentSnapshot.data}")
+        if (!documentSnapshot.exists()) {
+            throw Exception("User document not found")
+        }
+
+        val data = documentSnapshot.data ?: throw Exception("Document is empty")
+
+        // Explicit mappelés
+        val id = data["id"] as? String ?: ""
+        val email = data["email"] as? String ?: ""
+        val displayName = data["displayName"] as? String ?: ""
+        val isAnonymous = data["isAnonymous"] as? Boolean ?: true
+
+
+        return User(
+            id = id,
+            email = email,
+            displayName = displayName,
+            isAnonymous = isAnonymous
+        )
+    }
+
 
     override suspend fun createAnonymousAccount() {
         Firebase.auth.signInAnonymously().await()
@@ -64,14 +86,13 @@ class AccountServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun linkAccountWithGoogle(idToken: String) {
-        val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
-        Firebase.auth.currentUser!!.linkWithCredential(firebaseCredential).await()
-    }
-
     override suspend fun linkAccountWithEmail(email: String, password: String) {
         val credential = EmailAuthProvider.getCredential(email, password)
         Firebase.auth.currentUser!!.linkWithCredential(credential).await()
+        Firebase.auth.currentUser?.reload()?.await()
+        Firebase.auth.currentUser?.let { user ->
+            saveUserToFirestore(user)
+        }
     }
 
     override suspend fun signInWithGoogle(idToken: String) {
@@ -104,7 +125,7 @@ class AccountServiceImpl @Inject constructor(
     private suspend fun saveUserToFirestore(user: FirebaseUser) {
         val userDoc = firestore.collection("users").document(user.uid)
         val email = user.email.orEmpty()
-        val displayName = user.displayName.orEmpty()
+        val displayName = if(user.displayName == null || user.displayName == "") email else user.displayName.orEmpty()
         val keywords = generateKeywords(email) + generateKeywords(displayName)
         val userData = mapOf(
             "id" to user.uid,
@@ -170,7 +191,7 @@ class AccountServiceImpl @Inject constructor(
             }
     }
 
-    private fun FirebaseUser?.toNotesUser(): User {
+    private fun FirebaseUser?.toUser(): User {
         return if (this == null) User() else User(
             id = this.uid,
             email = this.email ?: "",

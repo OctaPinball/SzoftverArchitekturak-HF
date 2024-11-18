@@ -1,6 +1,7 @@
 package com.example.turaalkalmazas.screens.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -85,14 +86,14 @@ import com.example.turaalkalmazas.ui.theme.Theme
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val user by viewModel.user.collectAsState(initial = User())
+    val user by viewModel.user.collectAsState()
 
     Theme {
+        Log.d("SuperLog Main", "UserName: ${user.displayName} ${user.isAnonymous}")
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
             val appState = rememberAppState(snackbarHostState)
@@ -302,6 +303,7 @@ fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Un
 
 @Composable
 fun UserCard(userName: String, profileImage: ImageVector, onClick: () -> Unit) {
+    Log.d("SuperLog UserCard", "UserName: ${userName}")
     Row(
         modifier = Modifier
             .fillMaxWidth()

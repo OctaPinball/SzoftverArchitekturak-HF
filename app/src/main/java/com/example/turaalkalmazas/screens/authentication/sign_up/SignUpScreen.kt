@@ -57,7 +57,7 @@ fun SignUpScreen(
 
     LaunchedEffect(Unit) {
         launchCredManBottomSheet(context) { result ->
-            viewModel.onSignUpWithGoogle(result, restartApp)
+            viewModel.onSignInWithGoogle(result, restartApp)
         }
     }
 
@@ -190,8 +190,8 @@ fun SignUpScreen(
                     .padding(8.dp)
             )
 
-            AuthenticationButton(R.string.sign_up_with_google) { credential ->
-                viewModel.onSignUpWithGoogle(credential, restartApp)
+            AuthenticationButton(R.string.sign_in_with_google) { credential ->
+                viewModel.onSignInWithGoogle(credential, restartApp)
             }
         }
     }

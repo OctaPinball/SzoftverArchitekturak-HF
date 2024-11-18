@@ -29,7 +29,7 @@ class AccountCenterViewModel @Inject constructor(
     fun onUpdateDisplayNameClick(newDisplayName: String) {
         launchCatching {
             accountService.updateDisplayName(newDisplayName)
-            _user.value = accountService.getUserProfile()
+            _user.value = accountService.getDetailedUserProfile()
         }
     }
 
