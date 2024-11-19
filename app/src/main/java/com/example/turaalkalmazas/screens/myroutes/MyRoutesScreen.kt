@@ -25,6 +25,11 @@ fun MyRoutesScreen(
 ) {
     val routes by remember { derivedStateOf { viewModel.routes } }
 
+    // Csak a teszteléshez kell a MyRoutes scree megnyitásakor hozzáadja az utakat a Firebasehez
+    LaunchedEffect(Unit) {
+        viewModel.testAddRoute()
+    }
+
     Scaffold { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -67,7 +72,8 @@ fun RouteItem(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = route.name, style = MaterialTheme.typography.h6)
             Text(
-                text = "Length: ${route.length}, Duration: ${route.duration}, Difficulty: ${route.difficulty}",
+                text = "Length: ${route.length}, Duration: ${route.duration}, " +
+                        "Difficulty: ${route.difficulty}",
                 style = MaterialTheme.typography.body2
             )
             Row(
@@ -84,7 +90,8 @@ fun RouteItem(
                     )
                 }
                 Row (verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = if (route.isShared) "Shared" else "Private", style = MaterialTheme.typography.body2)
+                    Text(text = if (route.isShared) "Shared" else "Private",
+                        style = MaterialTheme.typography.body2)
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
                         checked = isShared,
@@ -106,7 +113,7 @@ fun RouteItem(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        onDeleteClick(route)  // Proceed with deleting the route
+                        onDeleteClick(route)
                         showDeleteDialog = false
                     }
                 ) {
