@@ -6,6 +6,4 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyRoutesViewModel @Inject constructor(
-) : AppViewModel() {
-
-}
+) : AppViewModel()

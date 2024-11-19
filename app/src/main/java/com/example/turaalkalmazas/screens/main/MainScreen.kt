@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -68,6 +69,7 @@ import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.USER_DEFAULT_ID
 import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.USER_ID_ARG
+import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.screens.account_center.AccountCenterScreen
 import com.example.turaalkalmazas.screens.authentication.sign_in.SignInScreen
@@ -82,6 +84,7 @@ import com.example.turaalkalmazas.screens.myroutes.MyRoutesScreen
 import com.example.turaalkalmazas.screens.routes.RoutesScreen
 import com.example.turaalkalmazas.screens.splash.SplashScreen
 import com.example.turaalkalmazas.ui.theme.Theme
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
 import androidx.navigation.compose.rememberNavController
 import com.example.turaalkalmazas.ROUTE_DEFAULT_ID
@@ -206,8 +209,29 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
         )
     }
 
-    composable(MY_ROUTES_SCREEN){
-        MyRoutesScreen()
+    composable(MY_ROUTES_SCREEN) {
+        val routes = remember {
+            mutableStateListOf(
+                Route("1", "Forest Trail", "5km", "1hr", "Easy", false),
+                Route("2", "Mountain Path", "12km", "3hrs", "Hard", true)
+            )
+        }
+
+        MyRoutesScreen(
+            routes = routes,
+            onRouteClick = { route ->
+                appState.navigate("routeDetails/${route.id}")
+            },
+            onDeleteRouteClick = { route ->
+                routes.remove(route)
+            },
+            onSharedChange = { route, isShared ->
+                val index = routes.indexOf(route)
+                if (index != -1) {
+                    routes[index] = route.copy(isShared = isShared)
+                }
+            }
+        )
     }
 
     composable(FRIENDS_SCREEN){

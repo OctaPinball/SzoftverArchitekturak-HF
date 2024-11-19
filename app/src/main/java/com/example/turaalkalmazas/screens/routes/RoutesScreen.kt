@@ -26,9 +26,9 @@ import com.example.turaalkalmazas.model.Route
 fun RoutesScreen(openScreen: (String) -> Unit) {
     // Példa adatok
     val routes = listOf(
-        Route("01asd","Kéktúra", "20 km", "Közepes"),
-        Route("02asd","Mátra túra", "15 km", "Nehéz"),
-        Route("03asd","Balaton kör", "25 km", "Könnyű")
+        Route("01asd","Kéktúra", "20 km", "1hr", "Közepes", true),
+        Route("02asd","Mátra túra", "15 km", "0.5hr","Nehéz", true),
+        Route("03asd","Balaton kör", "25 km", "1.5hr","Könnyű", true)
     )
 
     LazyColumn(
