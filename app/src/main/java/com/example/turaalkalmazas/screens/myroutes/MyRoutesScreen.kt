@@ -5,28 +5,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.model.Route
 
 @Composable
 fun MyRoutesScreen(
-    routes: List<Route>,
-    onRouteClick: (Route) -> Unit,
-    onDeleteRouteClick: (Route) -> Unit,
-    onSharedChange: (Route, Boolean) -> Unit
+    viewModel: MyRoutesViewModel = hiltViewModel(),
+    onRouteClick: (Route) -> Unit
 ) {
+    val routes by remember { derivedStateOf { viewModel.routes } }
+
     Scaffold { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -39,8 +37,10 @@ fun MyRoutesScreen(
                 RouteItem(
                     route = route,
                     onClick = onRouteClick,
-                    onDeleteClick = onDeleteRouteClick,
-                    onSharedChange = onSharedChange
+                    onDeleteClick = { viewModel.deleteRoute(it) },
+                    onSharedChange = { updatedRoute, isShared ->
+                        viewModel.updateSharedState(updatedRoute, isShared)
+                    }
                 )
             }
         }
@@ -55,6 +55,7 @@ fun RouteItem(
     onSharedChange: (Route, Boolean) -> Unit
 ) {
     var isShared by remember { mutableStateOf(route.isShared) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
@@ -76,14 +77,14 @@ fun RouteItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = if (route.isShared) "Shared" else "Private", style = MaterialTheme.typography.body2)
-                Row {
-                    IconButton(onClick = { onDeleteClick(route) }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Route"
-                        )
-                    }
+                IconButton(onClick = { showDeleteDialog = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Route"
+                    )
+                }
+                Row (verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = if (route.isShared) "Shared" else "Private", style = MaterialTheme.typography.body2)
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
                         checked = isShared,
@@ -95,5 +96,28 @@ fun RouteItem(
                 }
             }
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Confirm Deletion") },
+            text = { Text("Are you sure you want to delete this route?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteClick(route)  // Proceed with deleting the route
+                        showDeleteDialog = false
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

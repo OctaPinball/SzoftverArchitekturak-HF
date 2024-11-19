@@ -91,6 +91,7 @@ import com.example.turaalkalmazas.ROUTE_DEFAULT_ID
 import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
 import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.ROUTE_ID_ARG
+import com.example.turaalkalmazas.screens.myroutes.MyRoutesViewModel
 import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
 
 @Composable
@@ -210,26 +211,12 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 
     composable(MY_ROUTES_SCREEN) {
-        val routes = remember {
-            mutableStateListOf(
-                Route("1", "Forest Trail", "5km", "1hr", "Easy", false),
-                Route("2", "Mountain Path", "12km", "3hrs", "Hard", true)
-            )
-        }
+        val viewModel: MyRoutesViewModel = hiltViewModel()
 
         MyRoutesScreen(
-            routes = routes,
+            viewModel = viewModel,
             onRouteClick = { route ->
                 appState.navigate("routeDetails/${route.id}")
-            },
-            onDeleteRouteClick = { route ->
-                routes.remove(route)
-            },
-            onSharedChange = { route, isShared ->
-                val index = routes.indexOf(route)
-                if (index != -1) {
-                    routes[index] = route.copy(isShared = isShared)
-                }
             }
         )
     }
