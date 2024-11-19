@@ -1,6 +1,7 @@
 package com.example.turaalkalmazas.screens.main
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -95,14 +96,14 @@ import com.example.turaalkalmazas.screens.myroutes.MyRoutesViewModel
 import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val user by viewModel.user.collectAsState(initial = User())
+    val user by viewModel.user.collectAsState()
 
     Theme {
+        Log.d("SuperLog Main", "UserName: ${user.displayName} ${user.isAnonymous}")
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
             val appState = rememberAppState(snackbarHostState)
@@ -131,7 +132,7 @@ fun MainScreen(
                     Column {
                         Surface(
                             color = MaterialTheme.colorScheme.primary,
-                            shape = if(currentRoute in listOf(FRIENDS_SCREEN, ADD_FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN))
+                            shape = if(currentRoute in listOf(FRIENDS_SCREEN, ADD_FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN, MAP_SCREEN))
                                 RoundedCornerShape(0.dp)
                             else RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)
                         ) {
@@ -332,6 +333,7 @@ fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Un
 
 @Composable
 fun UserCard(userName: String, profileImage: ImageVector, onClick: () -> Unit) {
+    Log.d("SuperLog UserCard", "UserName: ${userName}")
     Row(
         modifier = Modifier
             .fillMaxWidth()

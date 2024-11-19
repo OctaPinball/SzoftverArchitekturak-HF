@@ -79,12 +79,17 @@ class SignUpViewModel @Inject constructor(
         }
     }
 
-    fun onSignUpWithGoogle(credential: Credential, restartApp: (String) -> Unit) {
+    fun onSignInWithGoogle(credential: Credential, restartApp: (String) -> Unit) {
         launchCatching {
             if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                accountService.linkAccountWithGoogle(googleIdTokenCredential.idToken)
-                restartApp(MAP_SCREEN)
+                try{
+                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                    accountService.signInWithGoogle(googleIdTokenCredential.idToken)
+                    restartApp(MAP_SCREEN)
+                } catch (e: Exception){
+                    SnackbarManager.showErrorMessage(e.message ?: "Unknown error")
+                    Log.e(ERROR_TAG, e.message ?: "Unknown error")
+                }
             } else {
                 Log.e(ERROR_TAG, UNEXPECTED_CREDENTIAL)
             }

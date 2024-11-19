@@ -126,6 +126,8 @@ class FriendsServiceImpl @Inject constructor(
     }
 
     override suspend fun getUserDetails(signedInUserId: String, userId: String): UserRelation {
+        Log.d("SuperLog FriendsService", "getUserDetails called with userId: $signedInUserId")
+
         val userDocRef = firestore.collection("users").document(userId)
         val user = userDocRef.get().await().toObject(User::class.java)
             ?: throw Exception("User not found")
