@@ -13,26 +13,91 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+
 
 class AccountServiceImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : AccountService {
 
-    override val currentUser: Flow<User?>
-        get() = callbackFlow {
-            val listener =
-                FirebaseAuth.AuthStateListener { auth ->
-                    this.trySend(auth.currentUser.toUser())
-                }
-            Firebase.auth.addAuthStateListener(listener)
-            awaitClose { Firebase.auth.removeAuthStateListener(listener) }
+    override val currentUser: Flow<User?> = callbackFlow {
+        val authListener = FirebaseAuth.AuthStateListener { auth ->
+            val firebaseUser = auth.currentUser
+            if (firebaseUser != null) {
+                trySend(firebaseUser.toUser()).isSuccess
+
+                // Indítjuk a Firestore figyelőt, és adatokat küldünk a flow-ba
+                val firestoreFlow = startFirestoreListener(firebaseUser.uid)
+                val job = firestoreFlow.onEach { user ->
+                    trySend(user).isSuccess
+                }.launchIn(this) // A flow gyűjtése a callbackFlow scope-jában
+            } else {
+                trySend(null).isSuccess
+            }
         }
+
+        // Hozzáadjuk az auth listenert
+        Firebase.auth.addAuthStateListener(authListener)
+
+        // Lezáráskezelés
+        awaitClose {
+            Firebase.auth.removeAuthStateListener(authListener)
+        }
+    }
+
+
+
+    private var firestoreListenerRegistration: ListenerRegistration? = null
+
+    private fun startFirestoreListener(userId: String): Flow<User?> = callbackFlow {
+        val userDocRef = firestore.collection("users").document(userId)
+        val registration = userDocRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("SuperLog FirestoreListener", "Error listening to Firestore document: ${error.message}")
+                close(error) // Hibával lezárjuk a flow-t
+                return@addSnapshotListener
+            }
+
+            snapshot?.let {
+                val data = it.data ?: return@let
+                val user = User(
+                    id = data["id"] as? String ?: "",
+                    email = data["email"] as? String ?: "",
+                    displayName = data["displayName"] as? String ?: "",
+                    isAnonymous = data["isAnonymous"] as? Boolean ?: true
+                )
+                // Adat küldése a flow-ba
+                trySend(user).isSuccess
+            }
+        }
+        Log.d("SuperLog FirestoreListener", "Firestore listener started")
+
+        awaitClose {
+            // Lezáráskor a figyelő leállítása
+            registration.remove()
+            Log.d("SuperLog FirestoreListener", "Firestore listener stopped")
+        }
+    }
+
+
+
+    private fun stopFirestoreListener() {
+        firestoreListenerRegistration?.remove()
+        firestoreListenerRegistration = null
+        Log.d("SuperLog FirestoreListener", "Firestore listener stopped")
+    }
+
 
     override val currentUserId: String
         get() = Firebase.auth.currentUser?.uid.orEmpty()
@@ -192,11 +257,16 @@ class AccountServiceImpl @Inject constructor(
     }
 
     private fun FirebaseUser?.toUser(): User {
-        return if (this == null) User() else User(
-            id = this.uid,
-            email = this.email ?: "",
-            displayName = this.displayName ?: "",
-            isAnonymous = this.isAnonymous
-        )
+        return if (this == null) {
+            User()
+        } else {
+            User(
+                id = this.uid,
+                email = this.email.orEmpty(),
+                displayName = this.displayName.orEmpty(),
+                isAnonymous = this.isAnonymous
+            )
+        }
     }
+
 }

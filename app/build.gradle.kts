@@ -49,6 +49,7 @@ android {
     }
 }
 
+
 dependencies {
     implementation("androidx.compose.material:material:1.4.2")
     implementation("androidx.core:core-ktx:1.13.0")
@@ -88,6 +89,8 @@ dependencies {
     implementation ("com.google.maps.android:maps-compose-utils:4.4.1")
     implementation ("com.google.maps.android:maps-compose-widgets:4.4.1")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 }
 
 secrets {

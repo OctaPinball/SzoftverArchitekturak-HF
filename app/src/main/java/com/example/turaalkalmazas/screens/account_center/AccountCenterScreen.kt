@@ -33,7 +33,6 @@ import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.ui.theme.Theme
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 fun AccountCenterScreen(
     restartApp: (String) -> Unit,
@@ -98,7 +97,6 @@ fun AccountCenterScreen(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun DisplayNameCard(displayName: String, onUpdateDisplayNameClick: (String) -> Unit) {
     var showDisplayNameDialog by remember { mutableStateOf(false) }
     var newDisplayName by remember { mutableStateOf(displayName) }
