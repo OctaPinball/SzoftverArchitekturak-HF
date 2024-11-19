@@ -122,7 +122,7 @@ fun MainScreen(
                     Column {
                         Surface(
                             color = MaterialTheme.colorScheme.primary,
-                            shape = if(currentRoute in listOf(FRIENDS_SCREEN, ADD_FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN))
+                            shape = if(currentRoute in listOf(FRIENDS_SCREEN, ADD_FRIENDS_SCREEN, FRIEND_REQUEST_SCREEN, MAP_SCREEN))
                                 RoundedCornerShape(0.dp)
                             else RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp)
                         ) {

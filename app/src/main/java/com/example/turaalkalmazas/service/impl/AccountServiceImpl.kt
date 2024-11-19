@@ -13,18 +13,14 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 
 class AccountServiceImpl @Inject constructor(
@@ -37,35 +33,28 @@ class AccountServiceImpl @Inject constructor(
             if (firebaseUser != null) {
                 trySend(firebaseUser.toUser()).isSuccess
 
-                // Indítjuk a Firestore figyelőt, és adatokat küldünk a flow-ba
                 val firestoreFlow = startFirestoreListener(firebaseUser.uid)
                 val job = firestoreFlow.onEach { user ->
                     trySend(user).isSuccess
-                }.launchIn(this) // A flow gyűjtése a callbackFlow scope-jában
+                }.launchIn(this)
             } else {
                 trySend(null).isSuccess
             }
         }
 
-        // Hozzáadjuk az auth listenert
         Firebase.auth.addAuthStateListener(authListener)
 
-        // Lezáráskezelés
         awaitClose {
             Firebase.auth.removeAuthStateListener(authListener)
         }
     }
 
-
-
-    private var firestoreListenerRegistration: ListenerRegistration? = null
-
     private fun startFirestoreListener(userId: String): Flow<User?> = callbackFlow {
         val userDocRef = firestore.collection("users").document(userId)
         val registration = userDocRef.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                Log.e("SuperLog FirestoreListener", "Error listening to Firestore document: ${error.message}")
-                close(error) // Hibával lezárjuk a flow-t
+                Log.e("FirestoreListener", "Error listening to Firestore document: ${error.message}")
+                close(error)
                 return@addSnapshotListener
             }
 
@@ -77,27 +66,15 @@ class AccountServiceImpl @Inject constructor(
                     displayName = data["displayName"] as? String ?: "",
                     isAnonymous = data["isAnonymous"] as? Boolean ?: true
                 )
-                // Adat küldése a flow-ba
+
                 trySend(user).isSuccess
             }
         }
-        Log.d("SuperLog FirestoreListener", "Firestore listener started")
 
         awaitClose {
-            // Lezáráskor a figyelő leállítása
             registration.remove()
-            Log.d("SuperLog FirestoreListener", "Firestore listener stopped")
         }
     }
-
-
-
-    private fun stopFirestoreListener() {
-        firestoreListenerRegistration?.remove()
-        firestoreListenerRegistration = null
-        Log.d("SuperLog FirestoreListener", "Firestore listener stopped")
-    }
-
 
     override val currentUserId: String
         get() = Firebase.auth.currentUser?.uid.orEmpty()
@@ -109,32 +86,6 @@ class AccountServiceImpl @Inject constructor(
     override fun getUserProfile(): User {
         return Firebase.auth.currentUser.toUser()
     }
-
-    override suspend fun getDetailedUserProfile(): User {
-        val userDocRef = firestore.collection("users").document(currentUserId)
-        val documentSnapshot = userDocRef.get().await()
-        Log.d("SuperLog Document", "Data: ${documentSnapshot.data}")
-        if (!documentSnapshot.exists()) {
-            throw Exception("User document not found")
-        }
-
-        val data = documentSnapshot.data ?: throw Exception("Document is empty")
-
-        // Explicit mappelés
-        val id = data["id"] as? String ?: ""
-        val email = data["email"] as? String ?: ""
-        val displayName = data["displayName"] as? String ?: ""
-        val isAnonymous = data["isAnonymous"] as? Boolean ?: true
-
-
-        return User(
-            id = id,
-            email = email,
-            displayName = displayName,
-            isAnonymous = isAnonymous
-        )
-    }
-
 
     override suspend fun createAnonymousAccount() {
         Firebase.auth.signInAnonymously().await()
@@ -156,7 +107,7 @@ class AccountServiceImpl @Inject constructor(
         Firebase.auth.currentUser!!.linkWithCredential(credential).await()
         Firebase.auth.currentUser?.reload()?.await()
         Firebase.auth.currentUser?.let { user ->
-            saveUserToFirestore(user)
+            syncUserToFirestore(user)
         }
     }
 
@@ -164,14 +115,14 @@ class AccountServiceImpl @Inject constructor(
         val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
         Firebase.auth.signInWithCredential(firebaseCredential).await()
         Firebase.auth.currentUser?.let { user ->
-            saveUserToFirestore(user)
+            syncUserToFirestore(user)
         }
     }
 
     override suspend fun signInWithEmail(email: String, password: String) {
         Firebase.auth.signInWithEmailAndPassword(email, password).await()
         Firebase.auth.currentUser?.let { user ->
-            saveUserToFirestore(user)
+            syncUserToFirestore(user)
         }
     }
 
@@ -185,6 +136,30 @@ class AccountServiceImpl @Inject constructor(
         Firebase.auth.currentUser!!.delete().await()
         firestore.collection("users").document(userId).delete().await()
         removeFromEverywhere(userId)
+    }
+
+    private suspend fun syncUserToFirestore(user: FirebaseUser) {
+        val userDocRef = firestore.collection("users").document(user.uid)
+        val email = user.email.orEmpty()
+
+        var displayName = if (user.displayName.isNullOrEmpty()) email else user.displayName.orEmpty()
+
+        val userDocSnapshot = userDocRef.get().await()
+
+        if (userDocSnapshot.exists() && userDocSnapshot.contains("displayName")) {
+            displayName = userDocSnapshot.getString("displayName").orEmpty()
+        }
+
+        val keywords = generateKeywords(email) + generateKeywords(displayName)
+        val userData = mapOf(
+            "id" to user.uid,
+            "email" to email,
+            "displayName" to displayName,
+            "isAnonymous" to user.isAnonymous,
+            "keywords" to keywords
+        )
+
+        userDocRef.set(userData, SetOptions.merge()).await()
     }
 
     private suspend fun saveUserToFirestore(user: FirebaseUser) {
@@ -201,6 +176,7 @@ class AccountServiceImpl @Inject constructor(
         )
         userDoc.set(userData, SetOptions.merge()).await()
     }
+
 
     private fun generateKeywords(text: String): List<String> {
         val keywords = mutableListOf<String>()

@@ -16,7 +16,7 @@ class MainViewModel @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : AppViewModel() {
 
-    private val _user = MutableStateFlow<User>(User())
+    private val _user = MutableStateFlow(User())
     val user: StateFlow<User> get() = _user
 
     init {

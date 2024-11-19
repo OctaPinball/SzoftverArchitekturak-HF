@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,7 +24,7 @@ constructor(
     private val firestore: FirebaseFirestore
 ) : AppViewModel() {
     private val _user = MutableStateFlow(User())
-    val user: StateFlow<User> = _user.asStateFlow()
+    val user: StateFlow<User> get() = _user
     private val _userDetails = MutableStateFlow(UserRelation(User(), UserRelationType.NONE))
     val userDetails: StateFlow<UserRelation> = _userDetails.asStateFlow()
     val userId = MutableStateFlow("")
@@ -30,11 +32,15 @@ constructor(
     fun initialize(userIdIn: String) {
         launchCatching {
             userId.value = userIdIn
-            _user.value = accountService.getUserProfile()
 
-            val userId = userId.value
-            if (userId.isNotEmpty()) {
-                val userDocRef = firestore.collection("users").document(userId)
+            val currentUser = accountService.currentUser.firstOrNull()
+            if (currentUser != null) {
+                _user.value = currentUser
+            }
+
+            val userIdValue = userId.value
+            if (userIdValue.isNotEmpty()) {
+                val userDocRef = firestore.collection("users").document(userIdValue)
 
                 userDocRef.addSnapshotListener { snapshot, error ->
                     if (error != null) {
@@ -44,13 +50,22 @@ constructor(
 
                     if (snapshot != null && snapshot.exists()) {
                         launchCatching {
-                            _userDetails.value = friendsService.getUserDetails(user.value.id, userId)
+                            _userDetails.value = friendsService.getUserDetails(user.value.id, userIdValue)
                         }
+                    }
+                }
+            }
+
+            launch {
+                accountService.currentUser.collect { user ->
+                    if (user != null) {
+                        _user.value = user
                     }
                 }
             }
         }
     }
+
 
     fun onAddFriendClick(){
         launchCatching {
