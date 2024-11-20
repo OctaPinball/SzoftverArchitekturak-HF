@@ -16,12 +16,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
+import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.model.Route
 
 @Composable
 fun MyRoutesScreen(
     viewModel: MyRoutesViewModel = hiltViewModel(),
-    onRouteClick: (Route) -> Unit
+    openScreen: (String) -> Unit
 ) {
     val routes by remember { derivedStateOf { viewModel.routes } }
 
@@ -41,7 +43,10 @@ fun MyRoutesScreen(
             items(routes) { route ->
                 RouteItem(
                     route = route,
-                    onClick = onRouteClick,
+                    onClick = {
+                        // Navigálás a részletező képernyőre a megadott útvonal-azonosítóval
+                        openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+                    },
                     onDeleteClick = { viewModel.deleteRoute(it) },
                     onSharedChange = { updatedRoute, isShared ->
                         viewModel.updateSharedState(updatedRoute, isShared)

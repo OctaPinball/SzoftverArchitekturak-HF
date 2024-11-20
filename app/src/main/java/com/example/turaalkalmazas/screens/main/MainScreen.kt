@@ -215,8 +215,8 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
 
         MyRoutesScreen(
             viewModel = viewModel,
-            onRouteClick = { route ->
-                appState.navigate("routeDetails/${route.id}")
+            openScreen = { routeDetails ->
+                appState.navigate(routeDetails) // Ez az `openScreen`-hez illeszkedik
             }
         )
     }
