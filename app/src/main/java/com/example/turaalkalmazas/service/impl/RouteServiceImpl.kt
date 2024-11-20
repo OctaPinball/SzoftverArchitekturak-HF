@@ -11,7 +11,7 @@ class RouteServiceImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : RouteService {
 
-    private val routesCollection = firestore.collection("routes")
+    private val routesCollection = firestore.collection("paths")
 
     override suspend fun addRoute(route: Route) {
         val routeDoc = firestore.collection("paths").document()

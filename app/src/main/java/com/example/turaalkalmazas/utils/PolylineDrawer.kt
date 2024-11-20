@@ -8,6 +8,7 @@ import com.google.maps.android.compose.Polyline
 @Composable
 fun DrawPolyline(routePoints: List<LatLng>, color: Color = Color.Blue, width: Float = 5f) {
     if (routePoints.isNotEmpty()) {
+        println(routePoints)
         Polyline(points = routePoints.toList(), color = color, width = width)
     }
 }

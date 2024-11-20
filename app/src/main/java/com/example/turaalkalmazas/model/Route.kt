@@ -9,5 +9,5 @@ data class Route(
     val duration: String = "",
     val difficulty: String = "",
     var isShared: Boolean = true,
-    val routePoints: List<LatLng>
+    val routePoints: List<LatLng> = emptyList()
 )
