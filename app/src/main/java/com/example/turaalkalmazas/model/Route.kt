@@ -8,6 +8,6 @@ data class Route(
     val length: String = "",
     val duration: String = "",
     val difficulty: String = "",
-    var isShared: Boolean = true
-    //val route: List<LatLng>
+    var isShared: Boolean = true,
+    val routePoints: List<LatLng>
 )

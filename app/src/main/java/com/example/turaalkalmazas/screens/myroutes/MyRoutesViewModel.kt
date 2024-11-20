@@ -31,9 +31,9 @@ class MyRoutesViewModel @Inject constructor(private val routeService: RouteServi
     // Method to add test routes
     fun testAddRoute() {
         val newRoute1 = Route("1", "River Trail", "6km",
-            "2hrs", "Easy", false)
+            "2hrs", "Easy", false, mutableListOf())
         val newRoute2 = Route("2", "Mountain Path", "12km",
-            "3hrs", "Hard", true)
+            "3hrs", "Hard", true, mutableListOf())
         addRoute(newRoute1)
         addRoute(newRoute2)
     }
