@@ -28,9 +28,9 @@ fun MyRoutesScreen(
     val routes by remember { derivedStateOf { viewModel.routes } }
 
     // Csak a teszteléshez kell a MyRoutes scree megnyitásakor hozzáadja az utakat a Firebasehez
-    LaunchedEffect(Unit) {
-        viewModel.testAddRoute()
-    }
+    //LaunchedEffect(Unit) {
+    //    viewModel.testAddRoute()
+    //}
 
     Scaffold { paddingValues ->
         LazyColumn(
