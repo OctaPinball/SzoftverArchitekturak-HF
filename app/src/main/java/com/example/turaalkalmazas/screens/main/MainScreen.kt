@@ -103,7 +103,6 @@ fun MainScreen(
     val user by viewModel.user.collectAsState()
 
     Theme {
-        Log.d("SuperLog Main", "UserName: ${user.displayName} ${user.isAnonymous}")
         Surface(color = MaterialTheme.colorScheme.background) {
             val snackbarHostState = remember { SnackbarHostState() }
             val appState = rememberAppState(snackbarHostState)
@@ -333,7 +332,6 @@ fun BottomNavigationBar(navController: NavController, openScreen: (String) -> Un
 
 @Composable
 fun UserCard(userName: String, profileImage: ImageVector, onClick: () -> Unit) {
-    Log.d("SuperLog UserCard", "UserName: ${userName}")
     Row(
         modifier = Modifier
             .fillMaxWidth()
