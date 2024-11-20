@@ -1,6 +1,7 @@
 package com.example.turaalkalmazas.service.impl
 
 import com.example.turaalkalmazas.model.Route
+import com.example.turaalkalmazas.service.AccountService
 import com.example.turaalkalmazas.service.RouteService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -8,7 +9,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class RouteServiceImpl @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val accountService: AccountService
 ) : RouteService {
 
     private val routesCollection = firestore.collection("paths")
@@ -21,6 +23,7 @@ class RouteServiceImpl @Inject constructor(
         val duration = route.duration.orEmpty()
         val difficulty = route.difficulty.orEmpty()
         val isShared = route.isShared
+        val ownerID = accountService.currentUserId
         val routePoints = route.routePoints
         val routeData = mapOf(
             "id" to id,
@@ -29,6 +32,7 @@ class RouteServiceImpl @Inject constructor(
             "duration" to duration,
             "difficulty" to difficulty,
             "isShared" to isShared,
+            "ownerID" to ownerID,
             "routePoints" to routePoints
         )
         routeDoc.set(routeData, SetOptions.merge()).await()
@@ -44,7 +48,7 @@ class RouteServiceImpl @Inject constructor(
 
     override suspend fun updateRoute(route: Route) {
         try {
-            routesCollection.document(route.id).set(route)
+            routesCollection.document(route.id).set(route).await()
         } catch (e: Exception) {
             throw Exception("Failed to update route: ${e.message}")
         }
