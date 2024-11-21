@@ -16,6 +16,14 @@ import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.screens.map.MapScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import com.example.turaalkalmazas.utils.DrawPolyline
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun RouteDetailScreen(
@@ -27,6 +35,16 @@ fun RouteDetailScreen(
         viewModel.inicialize(routeId)
     }
     val routeDetails by viewModel.routeDetails.collectAsState()
+    val exampleRoutePoints = listOf(
+        LatLng(47.497913, 19.040236), // Budapest központja
+        LatLng(47.500000, 19.050000), // Egy másik pont
+        LatLng(47.503000, 19.060000)  // Harmadik pont
+    )
+
+    val initialPosition = LatLng(47.4979, 19.0402)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(initialPosition, 10f)
+    }
 
     // UI komponensek megjelenítése
     Column(
@@ -68,7 +86,15 @@ fun RouteDetailScreen(
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
-        // Térkép komponens
-        MapScreen()
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                mapType = MapType.NORMAL
+            )
+        ) {
+            DrawPolyline(routePoints = exampleRoutePoints, color = Color.Blue)
+        }
+
     }
 }
