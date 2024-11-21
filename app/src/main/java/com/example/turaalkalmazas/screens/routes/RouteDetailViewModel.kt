@@ -43,6 +43,4 @@ class RouteDetailViewModel @Inject constructor(
             loadRouteDetails()
         }
     }
-
-
 }

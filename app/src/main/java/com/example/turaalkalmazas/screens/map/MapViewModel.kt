@@ -12,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewModelScope
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.model.Route
+import com.example.turaalkalmazas.model.toLatLng
+import com.example.turaalkalmazas.model.toLatLngSimple
 import com.example.turaalkalmazas.service.AccountService
 import com.example.turaalkalmazas.service.RouteService
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -161,7 +163,7 @@ class MapViewModel @Inject constructor(
     // Túra leállítása
     fun stopTracking() {
         isTracking.value = false
-        routePoints.clear() // ezt kell kivenni hogy mentse a pontokat jol
+        //routePoints.clear() // ezt kell kivenni hogy mentse a pontokat jol
 
         val altitudeDifference = startingAltitude?.let { startAlt ->
             currentAltitude.value - startAlt
@@ -178,6 +180,7 @@ class MapViewModel @Inject constructor(
     // Útvonal mentése
     fun saveRoute(name: String) {
         val routeDistance = calculateRouteDistance(routePoints)
+        val simpleRoutePoints = routePoints.map { it.toLatLngSimple() }
         currentRoute.value = currentRoute.value.copy(
             name = name,
             //length = "${routeDistance / 1000} km",
@@ -185,10 +188,24 @@ class MapViewModel @Inject constructor(
             duration = formatDuration(elapsedTime.value),
             difficulty = "1",
             isShared = false,
-            routePoints = routePoints.toList()
+            routePoints = simpleRoutePoints
         )
         viewModelScope.launch {
             routeService.addRoute(currentRoute.value)
+        }
+    }
+
+    fun loadRoute(routeId: String) {
+        viewModelScope.launch {
+            val route = routeService.getRouteById(routeId) // Fetch route from database
+            if (route != null) {
+                val loadedPoints = route.routePoints.map { it.toLatLng() } // Convert to LatLng
+                routePoints.clear()
+                routePoints.addAll(loadedPoints) // Update in-app routePoints state
+                currentRoute.value = route // Set the current route
+            } else {
+                Log.d("MapViewModel", "Route not found with id $routeId")
+            }
         }
     }
 
