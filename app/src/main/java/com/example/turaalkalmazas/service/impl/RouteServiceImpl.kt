@@ -8,6 +8,7 @@ import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
+
 class RouteServiceImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val accountService: AccountService
@@ -63,12 +64,14 @@ class RouteServiceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getRouteById(routeID: String): Route? {
-        return try {
-            val snapshot = routesCollection.document(routeID).get().await()
-            snapshot.toObject(Route::class.java)
+    override suspend fun getRouteById(routeId: String): Route {
+        try {
+            val allRoutes = getAllRoutes()
+            val foundRoute = allRoutes.find { it.id == routeId }
+            return foundRoute ?: Route()
         } catch (e: Exception) {
-            null
+            throw Exception("Failed to fetch route with ID $routeId: ${e.message}")
         }
+
     }
 }

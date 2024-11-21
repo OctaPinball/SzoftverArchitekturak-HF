@@ -6,25 +6,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.screens.map.MapScreen
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 
 @Composable
-fun RouteDetailScreen(routeId: String,
-                      popUpScreen: (String) -> Unit,
-                      restartApp: (String) -> Unit,
-                      modifier: Modifier = Modifier) {
-    val name = "asd"
-    val difficulty = "nehez"
-    val length = "15 km"
-
-    if (name == "N/A" || difficulty == "N/A" || length == "N/A") {
-        Log.e("RouteDetailsScreen", "Hibás paraméterek! Név: $name, Nehézség: $difficulty, Hossz: $length")
+fun RouteDetailScreen(
+    routeId: String, // Átadott Route objektum
+    restartApp: (String) -> Unit,
+    viewModel: RouteDetailViewModel = hiltViewModel() // A RouteDetailViewModel példányosítása
+) {
+    LaunchedEffect(Unit) {
+        viewModel.inicialize(routeId)
     }
+    val routeDetails by viewModel.routeDetails.collectAsState()
 
+    // UI komponensek megjelenítése
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -34,13 +38,25 @@ fun RouteDetailScreen(routeId: String,
             text = "Details:",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom= 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-        Text(text = "Név: $name", fontSize = 18.sp, modifier = Modifier.padding(bottom= 8.dp))
-        Text(text = "Nehézség: $difficulty", fontSize = 18.sp, modifier = Modifier.padding(bottom= 8.dp))
-        Text(text = "Hossz: $length", fontSize = 18.sp)
+        Text(
+            text = "Név: ${routeDetails.name}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "Nehézség: ${routeDetails.difficulty}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = "Hossz: ${routeDetails.length}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        // Térkép komponens
         MapScreen()
-
     }
-
 }

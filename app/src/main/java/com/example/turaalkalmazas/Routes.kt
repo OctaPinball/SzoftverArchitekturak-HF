@@ -17,7 +17,7 @@ const val USER_ID = "userId"
 const val USER_DEFAULT_ID = "-1"
 const val USER_ID_ARG = "?$USER_ID={$USER_ID}"
 
-const val ROUTE_ID = "userId"
+const val ROUTE_ID = "routeId"
 const val ROUTE_DEFAULT_ID = "-1"
 const val ROUTE_ID_ARG = "?$ROUTE_ID={$ROUTE_ID}"
 
