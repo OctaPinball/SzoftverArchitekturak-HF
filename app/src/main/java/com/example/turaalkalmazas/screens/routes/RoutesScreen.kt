@@ -28,18 +28,55 @@ fun RoutesScreen(
     // Az állapot figyelése a ViewModel-ben tárolt route-ok alapján
     val routes by remember { derivedStateOf { viewModel.routes } }
 
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(16.dp)
     ) {
-        // Lista elem renderelése
-        items(routes) { route ->
-            RouteItem(route) {
-                openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+        // Fejléc sor hozzáadása
+        HeaderRow()
+
+        Spacer(modifier = Modifier.height(8.dp)) // Távolság a fejléc és a lista között
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Lista elem renderelése
+            items(routes) { route ->
+                RouteItem(route) {
+                    openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+                }
             }
         }
+    }
+}
+
+@Composable
+fun HeaderRow() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Tour",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = "Difficulty",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = "Distance",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -54,18 +91,18 @@ fun RouteItem(route: Route, onClick: () -> Unit) {
     ) {
         Text(
             text = route.name,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = route.difficulty,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             modifier = Modifier.weight(1f)
         )
         Text(
-            text = route.length,
-            fontSize = 16.sp,
+            text = route.length + " km",
+            fontSize = 14.sp,
             modifier = Modifier.weight(1f)
         )
     }

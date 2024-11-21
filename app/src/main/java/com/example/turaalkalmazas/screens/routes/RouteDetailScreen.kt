@@ -41,19 +41,31 @@ fun RouteDetailScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
         Text(
-            text = "Név: ${routeDetails.name}",
+            text = "Tour name: ${routeDetails.name}",
             fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
         Text(
-            text = "Nehézség: ${routeDetails.difficulty}",
+            text = "Difficulty: ${routeDetails.difficulty}",
             fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
         Text(
-            text = "Hossz: ${routeDetails.length}",
+            text = "Distance: ${routeDetails.length} km",
             fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        // Új Duration mező hozzáadása
+        Text(
+            text = "Duration: ${routeDetails.duration}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        Text(
+            text = "Height Difference: ${routeDetails.duration}",
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 4.dp)
         )
 
         // Térkép komponens
