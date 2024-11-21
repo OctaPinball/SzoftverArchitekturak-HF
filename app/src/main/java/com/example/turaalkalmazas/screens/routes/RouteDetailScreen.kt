@@ -17,6 +17,7 @@ import com.example.turaalkalmazas.screens.map.MapScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import com.example.turaalkalmazas.model.toLatLng
 import com.example.turaalkalmazas.utils.DrawPolyline
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -35,11 +36,7 @@ fun RouteDetailScreen(
         viewModel.inicialize(routeId)
     }
     val routeDetails by viewModel.routeDetails.collectAsState()
-    val exampleRoutePoints = listOf(
-        LatLng(47.497913, 19.040236), // Budapest központja
-        LatLng(47.500000, 19.050000), // Egy másik pont
-        LatLng(47.503000, 19.060000)  // Harmadik pont
-    )
+
 
     val initialPosition = LatLng(47.4979, 19.0402)
     val cameraPositionState = rememberCameraPositionState {
@@ -81,7 +78,7 @@ fun RouteDetailScreen(
         )
 
         Text(
-            text = "Height Difference: ${routeDetails.duration}",
+            text = "Height Difference: ${routeDetails.altitudeDiff}",
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
@@ -93,7 +90,7 @@ fun RouteDetailScreen(
                 mapType = MapType.NORMAL
             )
         ) {
-            DrawPolyline(routePoints = exampleRoutePoints, color = Color.Blue)
+            DrawPolyline(routePoints = routeDetails.routePoints.map { it.toLatLng() }, color = Color.Blue)
         }
 
     }
