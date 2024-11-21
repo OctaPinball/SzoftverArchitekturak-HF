@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,7 +22,12 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,6 +50,9 @@ class MapViewModel @Inject constructor(
         )
     )
     val isTracking = mutableStateOf(false)
+    private val elapsedTime = mutableStateOf(0L)
+    private val timerRunning = mutableStateOf(false)
+    private var timerJob: Job? = null
 
     // Útvonal pontjai
     val routePoints = mutableStateListOf<LatLng>()
@@ -123,12 +132,29 @@ class MapViewModel @Inject constructor(
             id = "",
             routePoints = mutableListOf()
         )
+
+        if (!timerRunning.value) {
+            timerRunning.value = true
+            startTimer()
+        }
+    }
+
+    fun startTimer() {
+        timerJob = CoroutineScope(Dispatchers.Main).launch {
+            while (timerRunning.value) {
+                delay(1000)
+                elapsedTime.value += 1
+            }
+        }
     }
 
     // Túra leállítása
     fun stopTracking() {
         isTracking.value = false
         routePoints.clear()
+
+        timerRunning.value = false
+        timerJob?.cancel()
     }
 
     // Útvonal mentése
@@ -138,7 +164,7 @@ class MapViewModel @Inject constructor(
             name = name,
             //length = "${routeDistance / 1000} km",
             length = routeDistance.toString(),
-            duration = "10 perc",
+            duration = formatDuration(elapsedTime.value),
             difficulty = "1",
             isShared = false,
             routePoints = routePoints.toList()
@@ -146,5 +172,27 @@ class MapViewModel @Inject constructor(
         viewModelScope.launch {
             routeService.addRoute(currentRoute.value)
         }
+    }
+
+    fun formatDuration(seconds: Long): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val sec = seconds % 60
+        return String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, sec)
+    }
+
+    fun fetchRoutePointsById(routeId: String) {
+        viewModelScope.launch {
+            val route = routeService.getRouteById(routeId)
+            if (route != null) {
+                Log.d("MapViewModel", "Route Points for route id $routeId: ${route.routePoints}")
+            } else {
+                Log.d("MapViewModel", "Route not found with id $routeId")
+            }
+        }
+    }
+
+    fun getElapsedTime(): Long {
+        return elapsedTime.value
     }
 }

@@ -62,4 +62,13 @@ class RouteServiceImpl @Inject constructor(
             throw Exception("Failed to fetch routes: ${e.message}")
         }
     }
+
+    override suspend fun getRouteById(routeID: String): Route? {
+        return try {
+            val snapshot = routesCollection.document(routeID).get().await()
+            snapshot.toObject(Route::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

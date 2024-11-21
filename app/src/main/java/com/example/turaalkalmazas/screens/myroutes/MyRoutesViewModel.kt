@@ -1,5 +1,6 @@
 package com.example.turaalkalmazas.screens.myroutes
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.turaalkalmazas.AppViewModel
@@ -20,6 +21,18 @@ class MyRoutesViewModel @Inject constructor(private val routeService: RouteServi
         }
     }
     val routes: List<Route> get() = _routes.value
+
+    fun fetchRoutePointsById(routeId: String) {
+        viewModelScope.launch {
+            val route = routeService.getRouteById(routeId)
+            if (route != null) {
+                Log.d("MapViewModel", "Route Points for route id $routeId: ${route.routePoints}")
+            } else {
+                Log.d("MapViewModel", "Route not found with id $routeId")
+            }
+        }
+    }
+
 
     fun addRoute(route: Route) {
         viewModelScope.launch {

@@ -7,4 +7,5 @@ interface RouteService {
     suspend fun deleteRoute(route: Route)
     suspend fun updateRoute(route: Route)
     suspend fun getAllRoutes(): List<Route>
+    suspend fun getRouteById(routeID: String): Route?
 }

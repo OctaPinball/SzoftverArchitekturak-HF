@@ -4,6 +4,7 @@ package com.example.turaalkalmazas.screens.map
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,6 +50,11 @@ fun MapScreen(
         viewModel.checkAndRequestPermission(context) {
             launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
+    }
+
+    LaunchedEffect(viewModel.getElapsedTime()) {
+        // Bármilyen változás az elapsedTime értékénél indít egy frissítést
+        // Az UI automatikusan frissülni fog, amikor a value változik
     }
 
     /*
@@ -112,6 +119,15 @@ fun MapScreen(
         ) {
             Text(text = if (viewModel.isTracking.value) "Túra Leállítása" else "Túra Indítása")
         }
+
+        Text(
+            text = "Time: ${viewModel.formatDuration(viewModel.getElapsedTime())}",
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(25.dp)
+                .align(Alignment.TopStart)
+        )
 
         // Mentési dialógus megjelenítése
         if (showSaveDialog) {
