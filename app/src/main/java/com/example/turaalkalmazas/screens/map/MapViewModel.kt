@@ -46,6 +46,8 @@ class MapViewModel @Inject constructor(
             duration = "",
             difficulty = "",
             isShared = false,
+            ownerId = "",
+            altitudeDiff = "",
             routePoints = mutableListOf()
         )
     )
@@ -55,6 +57,7 @@ class MapViewModel @Inject constructor(
     private val timerRunning = mutableStateOf(false)
     private var timerJob: Job? = null
 
+    var startingAltitude: Double? = null
     val currentLocation = mutableStateOf<LatLng?>(null)
     val currentAltitude = mutableStateOf(0.0)
 
@@ -138,6 +141,8 @@ class MapViewModel @Inject constructor(
             routePoints = mutableListOf()
         )
 
+        startingAltitude = currentAltitude.value
+
         if (!timerRunning.value) {
             timerRunning.value = true
             startTimer()
@@ -156,7 +161,15 @@ class MapViewModel @Inject constructor(
     // Túra leállítása
     fun stopTracking() {
         isTracking.value = false
-        routePoints.clear()
+        routePoints.clear() // ezt kell kivenni hogy mentse a pontokat jol
+
+        val altitudeDifference = startingAltitude?.let { startAlt ->
+            currentAltitude.value - startAlt
+        } ?: 0.0
+
+        currentRoute.value = currentRoute.value.copy(
+            altitudeDiff = altitudeDifference.toString()
+        )
 
         timerRunning.value = false
         timerJob?.cancel()

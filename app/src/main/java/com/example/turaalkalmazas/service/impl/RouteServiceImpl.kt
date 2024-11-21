@@ -19,12 +19,13 @@ class RouteServiceImpl @Inject constructor(
     override suspend fun addRoute(route: Route) {
         val routeDoc = firestore.collection("paths").document()
         val id = routeDoc.id
-        val name = route.name.orEmpty()
-        val length = route.length.orEmpty()
-        val duration = route.duration.orEmpty()
-        val difficulty = route.difficulty.orEmpty()
+        val name = route.name
+        val length = route.length
+        val duration = route.duration
+        val difficulty = route.difficulty
         val isShared = route.isShared
         val ownerID = accountService.currentUserId
+        val altitudeDiff = route.altitudeDiff
         val routePoints = route.routePoints
         val routeData = mapOf(
             "id" to id,
@@ -34,6 +35,7 @@ class RouteServiceImpl @Inject constructor(
             "difficulty" to difficulty,
             "isShared" to isShared,
             "ownerID" to ownerID,
+            "altitudeDiff" to altitudeDiff,
             "routePoints" to routePoints
         )
         routeDoc.set(routeData, SetOptions.merge()).await()

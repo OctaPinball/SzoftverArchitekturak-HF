@@ -10,5 +10,6 @@ data class Route(
     val difficulty: String = "",
     var isShared: Boolean = true,
     val ownerId: String = "",
+    val altitudeDiff: String = "",
     val routePoints: List<LatLng> = emptyList()
 )
