@@ -49,10 +49,14 @@ class MapViewModel @Inject constructor(
             routePoints = mutableListOf()
         )
     )
+
     val isTracking = mutableStateOf(false)
     private val elapsedTime = mutableStateOf(0L)
     private val timerRunning = mutableStateOf(false)
     private var timerJob: Job? = null
+
+    val currentLocation = mutableStateOf<LatLng?>(null)
+    val currentAltitude = mutableStateOf(0.0)
 
     // Útvonal pontjai
     val routePoints = mutableStateListOf<LatLng>()
@@ -72,6 +76,7 @@ class MapViewModel @Inject constructor(
         override fun onLocationResult(result: LocationResult) {
             result.lastLocation?.let { location ->
                 val newPoint = LatLng(location.latitude, location.longitude)
+                currentAltitude.value = location.altitude
                 routePoints.add(newPoint)
             }
         }
@@ -117,11 +122,11 @@ class MapViewModel @Inject constructor(
         ).setMinUpdateIntervalMillis(1000L).build()
 
         fusedLocationClient?.requestLocationUpdates(locationRequest, locationCallback, null)
-        fusedLocationClient?.removeLocationUpdates(locationCallback)
     }
 
     fun stopLocationUpdates() {
-        fusedLocationClient?.removeLocationUpdates(object : LocationCallback() {})
+        //fusedLocationClient?.removeLocationUpdates(object : LocationCallback() {})
+        fusedLocationClient?.removeLocationUpdates(locationCallback)
     }
 
     // Új túra indítása

@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -104,9 +105,11 @@ fun MapScreen(
             onClick = {
                 if (viewModel.isTracking.value) {
                     viewModel.stopTracking()
+                    viewModel.stopLocationUpdates()
                     showSaveDialog = true
                 } else {
                     viewModel.startTracking()
+                    viewModel.startLocationUpdates(context)
                 }
             },
             colors = ButtonDefaults.buttonColors(
@@ -119,27 +122,41 @@ fun MapScreen(
         ) {
             Text(text = if (viewModel.isTracking.value) "Túra Leállítása" else "Túra Indítása")
         }
-
-        Text(
-            text = "Time: ${viewModel.formatDuration(viewModel.getElapsedTime())}",
-            color = Color.Black,
-            fontWeight = FontWeight.Bold,
+        Column(
             modifier = Modifier
-                .padding(25.dp)
+                .padding(16.dp)
                 .align(Alignment.TopStart)
-        )
+                .background(
+                    color = Color(0x80000000),
+                    shape = RoundedCornerShape(8.dp)
+                )
+        ) {
+            Text(
+                text = "Time: ${viewModel.formatDuration(viewModel.getElapsedTime())}",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Altitude: ${viewModel.currentAltitude.value.toInt()} m",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         // Mentési dialógus megjelenítése
         if (showSaveDialog) {
             SaveRouteDialog(
                 onDismiss = {
                     viewModel.stopTracking()
+                    viewModel.stopLocationUpdates()
                     showSaveDialog = false
                 },
                 onSave = { routeName ->
                     // saveRouteToFirebase(routeName, routePoints)
                     viewModel.saveRoute(routeName)
                     viewModel.stopTracking()
+                    viewModel.stopLocationUpdates()
                     showSaveDialog = false // Dialógus bezárása
 
                 }
