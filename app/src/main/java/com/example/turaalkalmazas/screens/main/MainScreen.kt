@@ -252,6 +252,7 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
         FriendDetailsScreen(
             userId = it.arguments?.getString(USER_ID) ?: USER_DEFAULT_ID,
             popUpScreen = { appState.popUp() },
+            openScreen = { route -> appState.navigate(route) },
             restartApp = { route -> appState.clearAndNavigate(route) }
         )
     }

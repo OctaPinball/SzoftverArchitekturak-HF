@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -33,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.model.UserRelationType
 import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
+import com.example.turaalkalmazas.screens.routes.RouteList
 import com.example.turaalkalmazas.ui.theme.Theme
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -40,12 +42,14 @@ import com.example.turaalkalmazas.ui.theme.Theme
 fun FriendDetailsScreen(
     userId: String,
     popUpScreen: (String) -> Unit,
+    openScreen: (String) -> Unit,
     restartApp: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FriendDetailsViewModel = hiltViewModel(),
 ) {
     LaunchedEffect(Unit) { viewModel.initialize(userId) }
     val userDetails by viewModel.userDetails.collectAsState()
+    val routes by viewModel.routes.collectAsState()
 
     Theme {
         Column(
@@ -56,7 +60,8 @@ fun FriendDetailsScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalAlignment = CenterHorizontally
             ) {
                 Icon(
@@ -131,8 +136,12 @@ fun FriendDetailsScreen(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-
+            Divider(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                thickness = 1.dp,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            RouteList(openScreen, routes)
         }
     }
 }

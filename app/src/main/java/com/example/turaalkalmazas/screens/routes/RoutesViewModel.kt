@@ -15,13 +15,9 @@ class RoutesViewModel @Inject constructor(private val routeService: RouteService
     private val _routes = mutableStateOf<List<Route>>(emptyList())
 
     // Inicializálás és route-ok lekérése
-    fun initialize(ownerId: String?) {
+    init {
         viewModelScope.launch {
-            if (ownerId != null) {
-                _routes.value = routeService.getFriendRoutes(ownerId)
-            } else {
-                _routes.value = routeService.getAllRoutes()
-            }
+            _routes.value = routeService.getAllRoutes()
         }
     }
 

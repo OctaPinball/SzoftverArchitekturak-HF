@@ -24,28 +24,29 @@ import com.example.turaalkalmazas.model.Route
 @Composable
 fun RoutesScreen(
     openScreen: (String) -> Unit,
-    ownerId: String? = null,
     viewModel: RoutesViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) { viewModel.initialize(ownerId) }
-
-    // Az állapot figyelése a ViewModel-ben tárolt route-ok alapján
     val routes by remember { derivedStateOf { viewModel.routes } }
+    RouteList(openScreen, routes)
+}
 
+@Composable
+fun RouteList(
+    openScreen: (String) -> Unit,
+    routes: List<Route>
+){
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Fejléc sor hozzáadása
         HeaderRow()
 
-        Spacer(modifier = Modifier.height(8.dp)) // Távolság a fejléc és a lista között
+        Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Lista elem renderelése
             items(routes) { route ->
                 RouteItem(route) {
                     openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
