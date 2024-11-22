@@ -17,16 +17,16 @@ fun SaveRouteDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Text(text = "Útvonal mentése")
+            Text(text = "Saving a path")
         },
         text = {
             Column {
-                Text(text = "Kérlek, add meg az útvonal nevét!")
+                Text(text = "Please enter the name of the path!")
                 Spacer(modifier = Modifier.height(8.dp))
                 TextField(
                     value = routeName,
                     onValueChange = { routeName = it },
-                    label = { Text("Útvonal neve") }
+                    label = { Text("Name of the path") }
                 )
             }
         },
@@ -35,12 +35,12 @@ fun SaveRouteDialog(
                 onSave(routeName)
                 onDismiss()
             }) {
-                Text("Mentés")
+                Text("Save")
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("Mégse")
+                Text("Dismiss")
             }
         }
     )

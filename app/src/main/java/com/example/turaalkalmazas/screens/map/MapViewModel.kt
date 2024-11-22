@@ -194,12 +194,19 @@ class MapViewModel @Inject constructor(
     fun saveRoute(name: String) {
         val routeDistance = calculateRouteDistance(routePoints)
         val simpleRoutePoints = routePoints.map { it.toLatLngSimple() }
+        // Nehézség meghatározása
+        val difficulty = when (routeDistance.toInt()) {
+            in 0..999 -> "Easy"
+            in 1000..2000 -> "Moderate"
+            in 2001..3000 -> "Hard"
+            else -> "Extreme" // Minden 3000 feletti eset
+        }
         currentRoute.value = currentRoute.value.copy(
             name = name,
             //length = "${routeDistance / 1000} km",
             length = routeDistance.toString(),
             duration = formatDuration(elapsedTime.value),
-            difficulty = "1",
+            difficulty = difficulty,
             isShared = false,
             routePoints = simpleRoutePoints
         )

@@ -131,7 +131,7 @@ fun MapScreen(
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
         ) {
-            Text(text = if (viewModel.isTracking.value) "Túra Leállítása" else "Túra Indítása")
+            Text(text = if (viewModel.isTracking.value) "Stop" else "Start")
         }
         Column(
             modifier = Modifier
