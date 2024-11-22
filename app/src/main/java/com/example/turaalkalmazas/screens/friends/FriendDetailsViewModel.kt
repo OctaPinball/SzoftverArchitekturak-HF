@@ -2,11 +2,13 @@ package com.example.turaalkalmazas.screens.friends
 
 import android.util.Log
 import com.example.turaalkalmazas.AppViewModel
+import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.model.UserRelation
 import com.example.turaalkalmazas.model.UserRelationType
 import com.example.turaalkalmazas.service.AccountService
 import com.example.turaalkalmazas.service.FriendsService
+import com.example.turaalkalmazas.service.RouteService
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,7 @@ class FriendDetailsViewModel @Inject
 constructor(
     private val accountService: AccountService,
     private val friendsService: FriendsService,
+    private val routeService: RouteService,
     private val firestore: FirebaseFirestore
 ) : AppViewModel() {
     private val _user = MutableStateFlow(User())
@@ -28,6 +31,8 @@ constructor(
     private val _userDetails = MutableStateFlow(UserRelation(User(), UserRelationType.NONE))
     val userDetails: StateFlow<UserRelation> = _userDetails.asStateFlow()
     val userId = MutableStateFlow("")
+    private val _routes = MutableStateFlow<List<Route>>(emptyList())
+    val routes: StateFlow<List<Route>> get() = _routes
 
     fun initialize(userIdIn: String) {
         launchCatching {
@@ -62,6 +67,9 @@ constructor(
                         _user.value = user
                     }
                 }
+            }
+            launch {
+                _routes.value = routeService.getFriendRoutes(userIdIn)
             }
         }
     }
