@@ -28,12 +28,12 @@ import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.model.UserRelationType
-import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
 import com.example.turaalkalmazas.screens.routes.RouteList
 import com.example.turaalkalmazas.ui.theme.Theme
 
@@ -141,7 +141,26 @@ fun FriendDetailsScreen(
                 thickness = 1.dp,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
-            RouteList(openScreen, routes)
+            if(userDetails.relationType != UserRelationType.FRIEND)
+            {
+                Text(
+                    text = stringResource(R.string.add_friend_to_see_routes, userDetails.user.displayName),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+            else if(routes.isEmpty())
+            {
+                Text(
+                    text = stringResource(R.string.friend_does_not_have_routes, userDetails.user.displayName),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+            else
+            {
+                RouteList(openScreen, routes)
+            }
         }
     }
 }

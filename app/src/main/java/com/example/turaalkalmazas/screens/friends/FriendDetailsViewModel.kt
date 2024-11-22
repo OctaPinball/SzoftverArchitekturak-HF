@@ -56,6 +56,7 @@ constructor(
                     if (snapshot != null && snapshot.exists()) {
                         launchCatching {
                             _userDetails.value = friendsService.getUserDetails(user.value.id, userIdValue)
+                            _routes.value = routeService.getFriendRoutes(userIdIn)
                         }
                     }
                 }
@@ -67,9 +68,6 @@ constructor(
                         _user.value = user
                     }
                 }
-            }
-            launch {
-                _routes.value = routeService.getFriendRoutes(userIdIn)
             }
         }
     }
@@ -85,21 +83,18 @@ constructor(
     fun onRemoveFriendClick(){
         launchCatching {
             friendsService.removeFriend(user.value.id, userId.value)
-            _userDetails.value = friendsService.getUserDetails(user.value.id, userId.value)
         }
     }
 
     fun onAcceptClick(){
         launchCatching {
             friendsService.acceptFriendRequest(user.value.id, userId.value)
-            _userDetails.value = friendsService.getUserDetails(user.value.id, userId.value)
         }
     }
 
     fun onRejectClick(){
         launchCatching {
             friendsService.rejectFriendRequest(user.value.id, userId.value)
-            _userDetails.value = friendsService.getUserDetails(user.value.id, userId.value)
         }
     }
 }
