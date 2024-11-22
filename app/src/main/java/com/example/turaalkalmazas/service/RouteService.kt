@@ -8,5 +8,6 @@ interface RouteService {
     suspend fun updateRoute(route: Route)
     suspend fun getAllRoutes(): List<Route>
     suspend fun getFriendRoutes(friendId: String): List<Route>
+    suspend fun getUserRoutes(): List<Route>
     suspend fun getRouteById(routeId: String): Route
 }

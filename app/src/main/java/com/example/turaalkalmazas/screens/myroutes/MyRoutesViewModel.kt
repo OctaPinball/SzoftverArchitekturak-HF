@@ -36,7 +36,7 @@ class MyRoutesViewModel @Inject constructor(
             }
 
             viewModelScope.launch {
-                _routes.value = routeService.getAllRoutes()
+                _routes.value = routeService.getUserRoutes()
             }
         }
     }
@@ -56,7 +56,7 @@ class MyRoutesViewModel @Inject constructor(
     fun addRoute(route: Route) {
         viewModelScope.launch {
             routeService.addRoute(route)
-            _routes.value = routeService.getAllRoutes()
+            _routes.value = routeService.getUserRoutes()
         }
     }
 
@@ -74,7 +74,7 @@ class MyRoutesViewModel @Inject constructor(
     fun deleteRoute(route: Route) {
         viewModelScope.launch {
             routeService.deleteRoute(route)
-            _routes.value = routeService.getAllRoutes()
+            _routes.value = routeService.getUserRoutes()
         }
     }
 

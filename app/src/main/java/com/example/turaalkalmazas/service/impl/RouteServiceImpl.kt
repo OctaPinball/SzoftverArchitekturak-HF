@@ -26,7 +26,7 @@ class RouteServiceImpl @Inject constructor(
         val duration = route.duration
         val difficulty = route.difficulty
         val isShared = route.isShared
-        val ownerID = accountService.currentUserId
+        val ownerId = accountService.currentUserId
         val altitudeDiff = route.altitudeDiff
         val routePoints = route.routePoints
         val routeData = mapOf(
@@ -36,7 +36,7 @@ class RouteServiceImpl @Inject constructor(
             "duration" to duration,
             "difficulty" to difficulty,
             "isShared" to isShared,
-            "ownerID" to ownerID,
+            "ownerId" to ownerId,
             "altitudeDiff" to altitudeDiff,
             "routePoints" to routePoints
         )
@@ -76,12 +76,26 @@ class RouteServiceImpl @Inject constructor(
 
         return try {
             val querySnapshot = routesCollection
-                .whereEqualTo("ownerID", friendId)
+                .whereEqualTo("ownerId", friendId)
                 .whereEqualTo("isShared", true)
                 .get()
                 .await()
             querySnapshot.toObjects(Route::class.java)
 
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+    override suspend fun getUserRoutes(): List<Route> {
+        val userId = accountService.currentUserId
+        return try {
+            val querySnapshot = routesCollection
+                .whereEqualTo("ownerId", userId)
+                .get()
+                .await()
+            querySnapshot.toObjects(Route::class.java)
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
