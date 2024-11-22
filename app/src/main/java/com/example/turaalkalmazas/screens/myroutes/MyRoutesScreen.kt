@@ -85,7 +85,7 @@ fun RouteItem(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = route.name, style = MaterialTheme.typography.h6)
             Text(
-                text = "Length: ${route.length}, Duration: ${route.duration}, " +
+                text = "Length: ${"%.1f".format(route.length.toDouble())} m, Duration: ${route.duration}, " +
                         "Difficulty: ${route.difficulty}",
                 style = MaterialTheme.typography.body2
             )

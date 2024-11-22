@@ -106,7 +106,7 @@ fun RouteItem(route: Route, onClick: () -> Unit) {
             modifier = Modifier.weight(1f)
         )
         Text(
-            text = route.length + " km",
+            text = "${"%.1f".format(route.length.toDouble())} m",
             fontSize = 14.sp,
             modifier = Modifier.weight(1f)
         )
