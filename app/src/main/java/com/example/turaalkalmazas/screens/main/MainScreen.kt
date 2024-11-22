@@ -191,8 +191,13 @@ fun rememberAppState(
 
 fun NavGraphBuilder.notesGraph(appState: AppState) {
 
-    composable(MAP_SCREEN){
-        MapScreen()
+    composable(
+        route = "$MAP_SCREEN$ROUTE_ID_ARG",
+        arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID })
+    ){
+        MapScreen(
+            routeId = it.arguments?.getString(ROUTE_ID) ?: ROUTE_DEFAULT_ID,
+        )
     }
 
     composable(ROUTES_SCREEN) {
@@ -204,8 +209,8 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 
     composable(
-        route = "$ROUTE_DETAIL_SCREEN$ROUTE_ID_ARG", // Dynamic path to include routeId
-        arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID }) // Argument for the route ID
+        route = "$ROUTE_DETAIL_SCREEN$ROUTE_ID_ARG",
+        arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID })
     ) {
         RouteDetailScreen(
             routeId = it.arguments?.getString(ROUTE_ID) ?: ROUTE_DEFAULT_ID,

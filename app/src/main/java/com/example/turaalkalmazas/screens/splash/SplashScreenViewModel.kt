@@ -2,6 +2,8 @@ package com.example.turaalkalmazas.screens.splash
 
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.MAP_SCREEN
+import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
+import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.SPLASH_SCREEN
 import com.example.turaalkalmazas.service.AccountService
 import dagger.hilt.android.lifecycle.HiltViewModel

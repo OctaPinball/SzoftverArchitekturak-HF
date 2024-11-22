@@ -28,9 +28,17 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun MapScreen(
+    routeId: String,
     viewModel: MapViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val preloadedRoute by viewModel.preloadedRoute.collectAsState()
+    val preloadedRoutePoints by viewModel.preloadedRoutePoints.collectAsState()
+
+
+    LaunchedEffect(routeId) {
+        viewModel.loadRoute(routeId)
+    }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -98,6 +106,9 @@ fun MapScreen(
             )
         ) {
             DrawPolyline(routePoints = viewModel.routePoints, color = Color.Blue)
+            if(routeId != "-1") {
+                DrawPolyline(routePoints = preloadedRoutePoints, color = Color.Red, width = 10f)
+            }
         }
 
         // Túra indító/leállító gomb

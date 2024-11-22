@@ -28,6 +28,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
@@ -54,6 +56,11 @@ class MapViewModel @Inject constructor(
         )
     )
 
+    private val _preloadedRoute = MutableStateFlow(Route())
+    val preloadedRoute: StateFlow<Route> get() = _preloadedRoute
+    private val _preloadedRoutePoints = MutableStateFlow<List<LatLng>>(emptyList())
+    val preloadedRoutePoints: StateFlow<List<LatLng>> get() = _preloadedRoutePoints
+
     val isTracking = mutableStateOf(false)
     private val elapsedTime = mutableStateOf(0L)
     private val timerRunning = mutableStateOf(false)
@@ -65,6 +72,12 @@ class MapViewModel @Inject constructor(
 
     // Útvonal pontjai
     val routePoints = mutableStateListOf<LatLng>()
+
+    fun inicialize(routeId: String){
+        launchCatching{
+            loadRoute(routeId)
+        }
+    }
 
     // Engedélyek ellenőrzése és kérése
     fun checkAndRequestPermission(context: Context, onPermissionRequired: () -> Unit) {
@@ -197,14 +210,14 @@ class MapViewModel @Inject constructor(
 
     fun loadRoute(routeId: String) {
         viewModelScope.launch {
-            val route = routeService.getRouteById(routeId) // Fetch route from database
-            if (route != null) {
-                val loadedPoints = route.routePoints.map { it.toLatLng() } // Convert to LatLng
-                routePoints.clear()
-                routePoints.addAll(loadedPoints) // Update in-app routePoints state
-                currentRoute.value = route // Set the current route
-            } else {
-                Log.d("MapViewModel", "Route not found with id $routeId")
+            if (routeId != "-1") {
+                val route = routeService.getRouteById(routeId) // Fetch route from database
+                if (route != null) {
+                    _preloadedRoutePoints.value = route.routePoints.map { it.toLatLng() } // Convert to LatLng
+                    _preloadedRoute.value = route // Set the current route
+                } else {
+                    Log.d("MapViewModel", "Route not found with id $routeId")
+                }
             }
         }
     }
