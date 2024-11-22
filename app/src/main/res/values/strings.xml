@@ -42,4 +42,6 @@
     <string name="view">View</string>
     <string name="unfriend">Unfriend</string>
     <string name="please_sign_in">You haven\'t signed in yet. To have access this feature please sign in!</string>
+    <string name="add_friend_to_see_routes">You need to add %1$s as a friend, to see their shared routes!</string>
+    <string name="friend_does_not_have_routes">%1$s does not have any shared routes yet!</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.turaalkalmazas.screens.myroutes
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -19,6 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
 import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.model.Route
+import com.example.turaalkalmazas.screens.common.LogInToAccessFeature
+import com.example.turaalkalmazas.ui.theme.Theme
 
 @Composable
 fun MyRoutesScreen(
@@ -26,35 +29,40 @@ fun MyRoutesScreen(
     openScreen: (String) -> Unit
 ) {
     val routes by remember { derivedStateOf { viewModel.routes } }
+    val user by viewModel.user.collectAsState()
 
     // Csak a teszteléshez kell a MyRoutes scree megnyitásakor hozzáadja az utakat a Firebasehez
     //LaunchedEffect(Unit) {
     //    viewModel.testAddRoute()
     //}
-
-    Scaffold { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(routes) { route ->
-                RouteItem(
-                    route = route,
-                    onClick = {
-                        // Navigálás a részletező képernyőre a megadott útvonal-azonosítóval
-                        openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
-                    },
-                    onDeleteClick = { viewModel.deleteRoute(it) },
-                    onSharedChange = { updatedRoute, isShared ->
-                        viewModel.updateSharedState(updatedRoute, isShared)
+    Theme {
+        if (user.isAnonymous) {
+            LogInToAccessFeature(openScreen)
+        } else {
+            Scaffold { paddingValues ->
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(routes) { route ->
+                        RouteItem(
+                            route = route,
+                            onClick = {
+                                // Navigálás a részletező képernyőre a megadott útvonal-azonosítóval
+                                openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+                            },
+                            onDeleteClick = { viewModel.deleteRoute(it) },
+                            onSharedChange = { updatedRoute, isShared ->
+                                viewModel.updateSharedState(updatedRoute, isShared)
+                            }
+                        )
                     }
-                )
+                }
             }
-        }
-    }
+        }}
 }
 
 @Composable
