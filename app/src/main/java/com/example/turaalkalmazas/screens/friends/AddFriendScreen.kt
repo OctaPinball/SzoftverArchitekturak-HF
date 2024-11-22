@@ -26,9 +26,10 @@ import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.model.UserRelation
 import com.example.turaalkalmazas.model.UserRelationType
+import com.example.turaalkalmazas.screens.common.LogInToAccessFeature
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun AddFriendsScreen(
     openScreen: (String) -> Unit,
@@ -43,31 +44,7 @@ fun AddFriendsScreen(
 
     Theme {
         if (user.isAnonymous) {
-            Surface(color = MaterialTheme.colorScheme.background) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.please_sign_in),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { openScreen(SIGN_IN_SCREEN) },
-                        modifier = Modifier
-                            .fillMaxWidth(0.6f)
-                            .padding(horizontal = 16.dp)
-                    ) {
-                        Text(stringResource(R.string.sign_in))
-                    }
-                }
-            }
-
+            LogInToAccessFeature(openScreen)
         } else {
             Surface(color = MaterialTheme.colorScheme.background) {
                 Column(

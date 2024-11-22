@@ -5,22 +5,41 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.turaalkalmazas.AppViewModel
 import com.example.turaalkalmazas.model.Route
+import com.example.turaalkalmazas.model.User
+import com.example.turaalkalmazas.service.AccountService
 import com.example.turaalkalmazas.service.RouteService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MyRoutesViewModel @Inject constructor(private val routeService: RouteService)
+class MyRoutesViewModel @Inject constructor(
+    private val routeService: RouteService,
+    private val accountService: AccountService
+)
     : AppViewModel() {
 
     private val _routes = mutableStateOf<List<Route>>(emptyList())
+    val routes: List<Route> get() = _routes.value
+
+    private val _user = MutableStateFlow(User())
+    val user: StateFlow<User> get() = _user
+
     init {
-        viewModelScope.launch {
-            _routes.value = routeService.getAllRoutes()
+        launchCatching {
+            val currentUser = accountService.currentUser.firstOrNull()
+            if (currentUser != null) {
+                _user.value = currentUser
+            }
+
+            viewModelScope.launch {
+                _routes.value = routeService.getAllRoutes()
+            }
         }
     }
-    val routes: List<Route> get() = _routes.value
 
     fun fetchRoutePointsById(routeId: String) {
         viewModelScope.launch {
