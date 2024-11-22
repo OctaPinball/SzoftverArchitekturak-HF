@@ -16,4 +16,5 @@ interface FriendsService {
     suspend fun getUserDetails(signedInUserId: String, userId: String): UserRelation
     suspend fun removeFriend(userId: String, friendId: String)
     suspend fun searchFriends(userId: String, search: String): List<User>
+    suspend fun isFriends(userId: String, friendId: String): Boolean
 }

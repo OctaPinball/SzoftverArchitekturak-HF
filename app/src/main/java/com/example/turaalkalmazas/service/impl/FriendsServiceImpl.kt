@@ -158,6 +158,11 @@ class FriendsServiceImpl @Inject constructor(
         out
     }
 
+    override suspend fun isFriends(userId: String, friendId: String): Boolean{
+        val friendRelation = getUserDetails(userId, friendId)
+        return friendRelation.relationType == UserRelationType.FRIEND
+    }
+
     private suspend fun searchUser(query: String): List<User> {
         val users = mutableListOf<User>()
 

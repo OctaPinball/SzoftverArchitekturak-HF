@@ -2,6 +2,7 @@ package com.example.turaalkalmazas.service.impl
 
 import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.service.AccountService
+import com.example.turaalkalmazas.service.FriendsService
 import com.example.turaalkalmazas.service.RouteService
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -11,7 +12,8 @@ import javax.inject.Inject
 
 class RouteServiceImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val accountService: AccountService
+    private val accountService: AccountService,
+    private val friendsService: FriendsService
 ) : RouteService {
 
     private val routesCollection = firestore.collection("paths")
@@ -63,6 +65,25 @@ class RouteServiceImpl @Inject constructor(
             snapshot.toObjects(Route::class.java)
         } catch (e: Exception) {
             throw Exception("Failed to fetch routes: ${e.message}")
+        }
+    }
+
+    override suspend fun getFriendRoutes(friendId: String): List<Route> {
+        if(!friendsService.isFriends(accountService.currentUserId, friendId))
+        {
+            return emptyList()
+        }
+
+        return try {
+            val querySnapshot = routesCollection
+                .whereEqualTo("ownerID", friendId)
+                .get()
+                .await()
+            querySnapshot.toObjects(Route::class.java)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
         }
     }
 
