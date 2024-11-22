@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.turaalkalmazas.R
 import com.example.turaalkalmazas.model.UserRelationType
+import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
 import com.example.turaalkalmazas.ui.theme.Theme
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -130,6 +131,8 @@ fun FriendDetailsScreen(
                     }
                 }
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,9 +23,12 @@ import com.example.turaalkalmazas.model.Route
 
 @Composable
 fun RoutesScreen(
-    openScreen: (String) -> Unit,  // Az openScreen most már Route-t vár
+    openScreen: (String) -> Unit,
+    ownerId: String? = null,
     viewModel: RoutesViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) { viewModel.initialize(ownerId) }
+
     // Az állapot figyelése a ViewModel-ben tárolt route-ok alapján
     val routes by remember { derivedStateOf { viewModel.routes } }
 
