@@ -66,35 +66,6 @@ fun MapScreen(
         // Az UI automatikusan frissülni fog, amikor a value változik
     }
 
-    /*
-    // Helykövetés
-    LaunchedEffect(isTracking, locationPermissionGranted) {
-        if (isTracking && locationPermissionGranted) {
-            val locationRequest = com.google.android.gms.location.LocationRequest.Builder(
-                com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY,
-                2000L
-            ).apply {
-                setMinUpdateIntervalMillis(1000L)
-            }.build()
-
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                object : com.google.android.gms.location.LocationCallback() {
-                    override fun onLocationResult(result: com.google.android.gms.location.LocationResult) {
-                        result.lastLocation?.let { location ->
-                            val newPoint = LatLng(location.latitude, location.longitude)
-                            (currentRoute.route as MutableList).add(newPoint) // Új pont hozzáadása az útvonalhoz
-                            cameraPositionState.position = CameraPosition.fromLatLngZoom(newPoint, 15f)
-                        }
-                    }
-                },
-                null
-            )
-        } else {
-            fusedLocationClient.removeLocationUpdates(object : com.google.android.gms.location.LocationCallback() {})
-        }
-    }*/
-
     // Térkép és polilinia megjelenítése
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
