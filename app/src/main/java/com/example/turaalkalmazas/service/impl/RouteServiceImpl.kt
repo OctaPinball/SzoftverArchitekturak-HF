@@ -77,7 +77,7 @@ class RouteServiceImpl @Inject constructor(
         return try {
             val querySnapshot = routesCollection
                 .whereEqualTo("ownerId", friendId)
-                .whereEqualTo("isShared", true)
+                .whereEqualTo("shared", true)
                 .get()
                 .await()
             querySnapshot.toObjects(Route::class.java)
