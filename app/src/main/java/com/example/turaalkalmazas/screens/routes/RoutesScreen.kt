@@ -18,7 +18,6 @@ import com.example.turaalkalmazas.GLOBAL_DETAIL_SCREEN
 import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
 import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.model.BaseRoute
-import com.example.turaalkalmazas.model.GlobalRoute
 
 @Composable
 fun RoutesScreen(
@@ -26,7 +25,33 @@ fun RoutesScreen(
     viewModel: RoutesViewModel = hiltViewModel()
 ) {
     val routes by remember { derivedStateOf { viewModel.routes } }
-    RouteList(openScreen, routes)
+    GlobalRouteList(openScreen, routes)
+}
+
+@Composable
+fun GlobalRouteList(
+    openScreen: (String) -> Unit,
+    routes: List<BaseRoute>
+){
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        HeaderRow()
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(routes) { route ->
+                RouteItem(route) {
+                    openScreen("$GLOBAL_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -48,7 +73,7 @@ fun RouteList(
         ) {
             items(routes) { route ->
                 RouteItem(route) {
-                    openScreen("$GLOBAL_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
+                    openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
                 }
             }
         }
