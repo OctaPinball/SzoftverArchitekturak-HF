@@ -49,7 +49,7 @@ class MapViewModel @Inject constructor(
             length = "",
             duration = "",
             difficulty = "",
-            isShared = false,
+            shared = false,
             ownerId = "",
             altitudeDiff = "",
             routePoints = mutableListOf()
@@ -93,8 +93,8 @@ class MapViewModel @Inject constructor(
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             result.lastLocation?.let { location ->
-                val newPoint = LatLng(location.latitude, location.longitude)
                 currentAltitude.value = location.altitude
+                val newPoint = LatLng(location.latitude, location.longitude)
                 routePoints.add(newPoint)
             }
         }
@@ -157,6 +157,7 @@ class MapViewModel @Inject constructor(
         )
 
         startingAltitude = currentAltitude.value
+        Log.d("MapViewModel", "Starting altitude: ${currentAltitude.value}")
 
         if (!timerRunning.value) {
             timerRunning.value = true
@@ -204,10 +205,10 @@ class MapViewModel @Inject constructor(
         currentRoute.value = currentRoute.value.copy(
             name = name,
             //length = "${routeDistance / 1000} km",
-            length = routeDistance.toString(),
+            length = routeDistance.toInt().toString(),
             duration = formatDuration(elapsedTime.value),
             difficulty = difficulty,
-            isShared = false,
+            shared = false,
             routePoints = simpleRoutePoints
         )
         viewModelScope.launch {

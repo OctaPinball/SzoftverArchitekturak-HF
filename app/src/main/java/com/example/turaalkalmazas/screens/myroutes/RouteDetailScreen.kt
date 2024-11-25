@@ -1,6 +1,5 @@
-package com.example.turaalkalmazas.screens.routes
+package com.example.turaalkalmazas.screens.myroutes
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.turaalkalmazas.model.Route
-import com.example.turaalkalmazas.screens.map.MapScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -31,25 +28,24 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlin.math.roundToInt
 
 @Composable
 fun RouteDetailScreen(
-    routeId: String, // Átadott Route objektum
+    routeId: String,
     restartApp: (String) -> Unit,
-    viewModel: RouteDetailViewModel = hiltViewModel() // A RouteDetailViewModel példányosítása
+    viewModel: RouteDetailViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
         viewModel.inicialize(routeId)
     }
     val routeDetails by viewModel.routeDetails.collectAsState()
 
-
     val initialPosition = LatLng(47.4979, 19.0402)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialPosition, 10f)
     }
 
-    // UI komponensek megjelenítése
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,11 +77,11 @@ fun RouteDetailScreen(
             modifier = Modifier.padding(bottom = 4.dp)
         )
         Text(
-            text = "Distance: ${routeDetails.length} km",
+            text = "Distance: ${routeDetails.length.takeIf { it.isNotEmpty() }
+                ?.toDoubleOrNull()?.div(1000)?.let { "%.2f".format(it) } ?: 0} km",
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
-        // Új Duration mező hozzáadása
         Text(
             text = "Duration: ${routeDetails.duration}",
             fontSize = 18.sp,
@@ -93,7 +89,8 @@ fun RouteDetailScreen(
         )
 
         Text(
-            text = "Height Difference: ${routeDetails.altitudeDiff}",
+            text = "Height Difference: " +
+                    "${routeDetails.altitudeDiff.toDoubleOrNull()?.roundToInt() ?: 0} m",
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )

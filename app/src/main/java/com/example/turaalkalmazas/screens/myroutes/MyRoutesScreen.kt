@@ -1,6 +1,6 @@
 package com.example.turaalkalmazas.screens.myroutes
 
-import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -31,10 +31,10 @@ fun MyRoutesScreen(
     val routes by remember { derivedStateOf { viewModel.routes } }
     val user by viewModel.user.collectAsState()
 
-    // Csak a teszteléshez kell a MyRoutes scree megnyitásakor hozzáadja az utakat a Firebasehez
-    //LaunchedEffect(Unit) {
-    //    viewModel.testAddRoute()
-    //}
+    LaunchedEffect(routes) {
+        Log.d("MyRoutesScreen", "Current Routes: $routes")
+    }
+
     Theme {
         if (user.isAnonymous) {
             LogInToAccessFeature(openScreen)
@@ -51,12 +51,11 @@ fun MyRoutesScreen(
                         RouteItem(
                             route = route,
                             onClick = {
-                                // Navigálás a részletező képernyőre a megadott útvonal-azonosítóval
                                 openScreen("$ROUTE_DETAIL_SCREEN?$ROUTE_ID=${route.id}")
                             },
                             onDeleteClick = { viewModel.deleteRoute(it) },
-                            onSharedChange = { updatedRoute, isShared ->
-                                viewModel.updateSharedState(updatedRoute, isShared)
+                            onSharedChange = { updatedRoute, shared ->
+                                viewModel.updateSharedState(updatedRoute, shared)
                             }
                         )
                     }
@@ -72,7 +71,7 @@ fun RouteItem(
     onDeleteClick: (Route) -> Unit,
     onSharedChange: (Route, Boolean) -> Unit
 ) {
-    var isShared by remember { mutableStateOf(route.isShared) }
+    var shared by remember { mutableStateOf(route.shared) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Card(
@@ -103,13 +102,12 @@ fun RouteItem(
                     )
                 }
                 Row (verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = if (route.isShared) "Shared" else "Private",
+                    Text(text = if (route.shared) "Shared" else "Private",
                         style = MaterialTheme.typography.body2)
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
-                        checked = isShared,
+                        checked = route.shared,
                         onCheckedChange = { newValue ->
-                            isShared = newValue
                             onSharedChange(route, newValue)
                         }
                     )

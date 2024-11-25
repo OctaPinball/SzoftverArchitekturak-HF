@@ -1,13 +1,10 @@
-package com.example.turaalkalmazas.screens.routes
+package com.example.turaalkalmazas.screens.myroutes
 
-import androidx.lifecycle.ViewModel
+import android.util.Log
 import com.example.turaalkalmazas.model.Route
 import com.example.turaalkalmazas.service.RouteService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.example.turaalkalmazas.AppViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,15 +19,25 @@ class RouteDetailViewModel @Inject constructor(
     private val _routeDetails = MutableStateFlow(Route())
     val routeDetails: StateFlow<Route> get() = _routeDetails
     val routeID = MutableStateFlow("")
-
+    /*
     fun loadRouteDetails() {
-        // Példa logika, hogy hogyan töltheted le a részleteket a service-ből
         viewModelScope.launch {
             _routeDetails.value = routeService.getRouteById(routeID.value)
         }
     }
+    */
+    fun loadRouteDetails() {
+        viewModelScope.launch {
+            try {
+                val route = routeService.getRouteById(routeID.value)
+                Log.d("RouteDetailViewModel", "Loaded route: $route")
+                _routeDetails.value = route
+            } catch (e: Exception) {
+                Log.e("RouteDetailViewModel", "Error loading route: ${e.message}")
+            }
+        }
+    }
 
-    // Ha szükséges új route hozzáadása
     fun addRoute(route: Route) {
         viewModelScope.launch {
             routeService.addRoute(route)

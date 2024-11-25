@@ -12,6 +12,7 @@ const val ADD_FRIENDS_SCREEN = "AddFriendsScreen"
 const val FRIEND_REQUEST_SCREEN = "FriendRequestScreen"
 const val FRIEND_DETAILS_SCREEN = "FriendDetailsScreen"
 const val ROUTE_DETAIL_SCREEN = "RouteDetailScreen"
+const val GLOBAL_DETAIL_SCREEN = "GlobalDetailScreen"
 
 const val USER_ID = "userId"
 const val USER_DEFAULT_ID = "-1"

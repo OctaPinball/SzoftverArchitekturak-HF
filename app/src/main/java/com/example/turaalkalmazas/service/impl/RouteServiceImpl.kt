@@ -25,7 +25,7 @@ class RouteServiceImpl @Inject constructor(
         val length = route.length
         val duration = route.duration
         val difficulty = route.difficulty
-        val isShared = route.isShared
+        val shared = route.shared
         val ownerId = accountService.currentUserId
         val altitudeDiff = route.altitudeDiff
         val routePoints = route.routePoints
@@ -35,7 +35,7 @@ class RouteServiceImpl @Inject constructor(
             "length" to length,
             "duration" to duration,
             "difficulty" to difficulty,
-            "isShared" to isShared,
+            "shared" to shared,
             "ownerId" to ownerId,
             "altitudeDiff" to altitudeDiff,
             "routePoints" to routePoints

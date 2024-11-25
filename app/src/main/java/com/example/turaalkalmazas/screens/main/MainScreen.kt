@@ -1,7 +1,6 @@
 package com.example.turaalkalmazas.screens.main
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -33,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -59,6 +56,7 @@ import com.example.turaalkalmazas.AppState
 import com.example.turaalkalmazas.FRIENDS_SCREEN
 import com.example.turaalkalmazas.FRIEND_DETAILS_SCREEN
 import com.example.turaalkalmazas.FRIEND_REQUEST_SCREEN
+import com.example.turaalkalmazas.GLOBAL_DETAIL_SCREEN
 import com.example.turaalkalmazas.MAP_SCREEN
 import com.example.turaalkalmazas.MY_ROUTES_SCREEN
 import com.example.turaalkalmazas.R
@@ -70,8 +68,6 @@ import com.example.turaalkalmazas.SnackbarManager
 import com.example.turaalkalmazas.USER_DEFAULT_ID
 import com.example.turaalkalmazas.USER_ID
 import com.example.turaalkalmazas.USER_ID_ARG
-import com.example.turaalkalmazas.model.Route
-import com.example.turaalkalmazas.model.User
 import com.example.turaalkalmazas.screens.account_center.AccountCenterScreen
 import com.example.turaalkalmazas.screens.authentication.sign_in.SignInScreen
 import com.example.turaalkalmazas.screens.authentication.sign_up.SignUpScreen
@@ -85,15 +81,14 @@ import com.example.turaalkalmazas.screens.myroutes.MyRoutesScreen
 import com.example.turaalkalmazas.screens.routes.RoutesScreen
 import com.example.turaalkalmazas.screens.splash.SplashScreen
 import com.example.turaalkalmazas.ui.theme.Theme
-import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineScope
-import androidx.navigation.compose.rememberNavController
 import com.example.turaalkalmazas.ROUTE_DEFAULT_ID
 import com.example.turaalkalmazas.ROUTE_DETAIL_SCREEN
 import com.example.turaalkalmazas.ROUTE_ID
 import com.example.turaalkalmazas.ROUTE_ID_ARG
 import com.example.turaalkalmazas.screens.myroutes.MyRoutesViewModel
-import com.example.turaalkalmazas.screens.routes.RouteDetailScreen
+import com.example.turaalkalmazas.screens.myroutes.RouteDetailScreen
+import com.example.turaalkalmazas.screens.routes.GlobalDetailScreen
 
 @Composable
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -209,6 +204,16 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
     }
 
     composable(
+        route = "$GLOBAL_DETAIL_SCREEN$ROUTE_ID_ARG",
+        arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID })
+    ) {
+        GlobalDetailScreen(
+            routeId = it.arguments?.getString(ROUTE_ID) ?: ROUTE_DEFAULT_ID,
+            restartApp = {route -> appState.clearAndNavigate(route)}
+        )
+    }
+
+    composable(
         route = "$ROUTE_DETAIL_SCREEN$ROUTE_ID_ARG",
         arguments = listOf(navArgument(ROUTE_ID) { defaultValue = ROUTE_DEFAULT_ID })
     ) {
@@ -224,7 +229,7 @@ fun NavGraphBuilder.notesGraph(appState: AppState) {
         MyRoutesScreen(
             viewModel = viewModel,
             openScreen = { routeDetails ->
-                appState.navigate(routeDetails) // Ez az `openScreen`-hez illeszkedik
+                appState.navigate(routeDetails)
             }
         )
     }

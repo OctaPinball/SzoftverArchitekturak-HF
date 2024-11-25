@@ -52,23 +52,11 @@ class MyRoutesViewModel @Inject constructor(
         }
     }
 
-
     fun addRoute(route: Route) {
         viewModelScope.launch {
             routeService.addRoute(route)
             _routes.value = routeService.getUserRoutes()
         }
-    }
-
-    // Method to add test routes
-    fun testAddRoute() {
-
-        val newRoute1 = Route(name = "River Trail", length = "6km",
-            duration = "2hrs", difficulty = "Easy", isShared = true, routePoints =  mutableListOf())
-        val newRoute2 = Route(name = "Mountain Path", length = "12km",
-            duration = "3hrs", difficulty = "Hard", isShared = true, routePoints =  mutableListOf())
-        addRoute(newRoute1)
-        addRoute(newRoute2)
     }
 
     fun deleteRoute(route: Route) {
@@ -78,13 +66,13 @@ class MyRoutesViewModel @Inject constructor(
         }
     }
 
-    fun updateSharedState(route: Route, isShared: Boolean) {
+    fun updateSharedState(route: Route, shared: Boolean) {
         _routes.value = _routes.value.map {
-            if (it.id == route.id) it.copy(isShared = isShared) else it
+            if (it.id == route.id) it.copy(shared = shared) else it
         }
 
         viewModelScope.launch {
-            routeService.updateRoute(route.copy(isShared = isShared))
+            routeService.updateRoute(route.copy(shared = shared))
         }
     }
 }
