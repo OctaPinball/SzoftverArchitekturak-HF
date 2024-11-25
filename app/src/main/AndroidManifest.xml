@@ -17,11 +17,6 @@
         android:theme="@style/Theme.TuraAlkalmazas"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service
-            android:name=".service.RouteService"
-            android:enabled="true"
-            android:exported="true"></service>
-
         <activity
             android:name=".MainActivity"
             android:exported="true"
